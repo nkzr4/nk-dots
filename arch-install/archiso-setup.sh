@@ -481,7 +481,7 @@ log_info "Gerando fstab.."
 genfstab -U -p /mnt >> /mnt/etc/fstab
 
 log_info "Preparando script para chroot.."
-curl -LO https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/chroot-setup.sh
+curl -LO https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-install/chroot-setup.sh
 mv /root/chroot-setup.sh /mnt/chroot-setup.sh
 chmod +x /mnt/chroot-setup.sh
 cat <<EOF > /mnt/vars.sh
