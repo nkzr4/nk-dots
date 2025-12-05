@@ -119,7 +119,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 log_info "Configurando scripts.."
 mkdir -p /home/$USERNAME/.config/nk-dots
-curl -LO https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/first-init.sh
+curl -LO https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-install/first-init.sh
 mv /first-init.sh /home/$USERNAME/.config/nk-dots/first-init.sh
 chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
 chown -R $USERNAME:$USERNAME /home/$USERNAME/.config/nk-dots
@@ -133,7 +133,7 @@ systemctl enable fstrim.timer
 systemctl enable acpid
 
 log_info "Finalizando preparação.."
-curl -LO LINKAQUI
+curl -LO https://https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/hyprland/hyprland.conf.default
 mkdir -p /home/$USERNAME/.config/hypr
 mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
 chown $USERNAME:$USERNAME /home/$USERNAME/.config/hypr/hyprland.conf
