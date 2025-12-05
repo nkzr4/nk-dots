@@ -96,7 +96,7 @@ else
 fi
 
 log_info "Iniciando instalação.."
-pacman -Sy base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-still libreoffice-still-$LANG_SHORT qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
+pacman -Sy base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
 
 echo ""
 echo "╭──────────────────────────────────────────────────────────────────────╮"
