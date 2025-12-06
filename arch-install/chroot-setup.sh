@@ -12,45 +12,30 @@ service_user() {
     log_info "Definindo fuso horário.."
     run ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
     run hwclock --systohc
-    echo ""
     log_success "Fuso horário definido como: $TIMEZONE.."
-    echo ""
     log_info "Definindo idioma.."
     run sed -i "s/^#\($LANGUAGE\)/\1/" /etc/locale.gen
     run locale-gen
     run echo "LANG=$LANGUAGE" >> /etc/locale.conf
-    echo ""
     log_success "Idioma definido como: $LANGUAGE.."
-    echo ""
     log_info "Definindo layout do teclado.."
     run echo "$KBLAYOUT" >> /etc/vconsole.conf
-    echo ""
     log_success "Layout definido como: $KBLAYOUT.."
-    echo ""
     log_info "Definindo nome do computador.."
     run echo "$PCNAME" >> /etc/hostname
-    echo ""
     log_success "Nome do computador definido como: $PCNAME.."
-    echo ""
     log_info "Definindo senha do root.."
     run echo -e "$ROOTPASSWD\n$ROOTPASSWD" | passwd root
-    echo ""
     log_success "Senha do root definida com sucesso.."
-    echo ""
     log_info "Criando usuário.."
     run useradd -m -g users -G wheel $USERNAME
-    echo ""
     log_success "Usuário '$USERNAME' criado com sucesso.."
-    echo ""
     log_info "Definindo senha de $USERNAME.."
     run echo -e "$USERPASSWD\n$USERPASSWD" | passwd $USERNAME
-    echo ""
     log_success "Senha de $USERNAME definida com sucesso.."
-    echo ""
     log_info "Garantindo a $USERNAME permissões de root.."
     run pacman -Sy --noconfirm sudo
     run echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
-    echo ""
     log_success "Permissões garantidas com sucesso.."
 }
 
@@ -63,9 +48,7 @@ service_installer() {
     run echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" >> /etc/pacman.conf
     run sed -i 's/^#\[multilib\]/[multilib]/' /etc/pacman.conf
     run sed -i '/^\[multilib\]/{n;s/^#Include/Include/}' /etc/pacman.conf	
-    echo ""
     log_success "Repositórios adicionados com sucesso.."
-    echo ""
     log_info "Definindo vendor do processador.."
     CPU_VENDOR=$(lscpu | grep "Vendor ID" | awk '{print $3}')
     if [[ $CPU_VENDOR == "GenuineIntel" ]]; then
@@ -74,12 +57,9 @@ service_installer() {
         cpu="amd-ucode"
     fi
     log_success "Vendor definido como '$CPU_VENDOR'.."
-    echo ""
     log_info "Iniciando instalação.."
     run pacman -S --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
-    echo ""
     log_success "Aplicações e dependências instaladas sucesso.."
-    echo ""
     log_info "Ativando serviços.."
     run systemctl enable NetworkManager
     run systemctl enable bluetooth
@@ -87,7 +67,6 @@ service_installer() {
     run systemctl enable firewalld
     run systemctl enable fstrim.timer
     run systemctl enable acpid
-    echo ""
     log_success "Serviços ativados com sucesso.."
 }
 
@@ -96,18 +75,14 @@ service_boot() {
     run sed -i 's/^MODULES=.*/MODULES=(btrfs)/' /etc/mkinitcpio.conf
     run sed -i '/^HOOKS=/ s/filesystems/sd-encrypt filesystems/' /etc/mkinitcpio.conf
     run mkinitcpio -p linux
-    echo ""
     log_success "mkinitcpio concluído com sucesso.."
-    echo ""
     log_info "Configurando GRUB.."
     run grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
     run grub-mkconfig -o /boot/grub/grub.cfg
     run DISK_LUKS_UUID=$(blkid -s UUID -o value $DISKNAME2)
     run sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
     run grub-mkconfig -o /boot/grub/grub.cfg
-    echo ""
     log_success "GRUB configurado com sucesso.."
-    echo ""
     log_info "Configurando script de primeira inicialização.."
     run mkdir -p /home/$USERNAME/.config/{nk-dots,hypr}
     run chown -R $USERNAME:wheel /home/$USERNAME/.config
@@ -116,9 +91,7 @@ service_boot() {
     run chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
     run cp /logs.sh /home/$USERNAME/.config/nk-dots/logs.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
-    echo ""
     log_success "Script preparado com sucesso.."
-    echo ""
     log_info "Finalizando preparação.."
     run curl -LO $LINKHYPRCONF
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
@@ -129,9 +102,7 @@ service_boot() {
     fi
     EOF
     run chown $USERNAME:wheel /home/$USERNAME/.bash_profile
-    echo ""
     log_success "Configuração do hyprland criada com sucesso.."
-    echo ""
     log_info "Saindo de ambiente chroot.."
 }
 
