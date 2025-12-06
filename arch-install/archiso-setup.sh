@@ -3,6 +3,9 @@
 
 # Todo
 # Arrumar automatização de senha do luksFormat e luksOpen
+# Organizar ordem de validations (disk por ultimo)
+# Criar log de input
+# Remover espaços desnecessários
 
 CONTINUE_ON_ERROR=false
 [[ "$1" == "--continue-on-error" ]] && CONTINUE_ON_ERROR=true
@@ -61,8 +64,10 @@ service_disk() {
     run sgdisk -n 2:0:0 -t 2:8300 $DISK
     log_success "Partições '$DISKNAME1' e '$DISKNAME2' criadas com sucesso.."
     log_info "Configurando criptografia LUKS na partição Linux.."
-    run printf "YES\n%s\n%s\n" "$LUKSPASSWD" "$LUKSPASSWD" | cryptsetup luksFormat "$DISKNAME2"
-    run printf "%s\n" "$LUKSPASSWD" | cryptsetup luksOpen "$DISKNAME2" main
+    run cryptsetup luksFormat "$DISKNAME2"
+    run cryptsetup luksOpen "$DISKNAME2" main
+    # run printf "YES\n%s\n%s\n" "$LUKSPASSWD" "$LUKSPASSWD" | cryptsetup luksFormat "$DISKNAME2"
+    # run printf "%s\n" "$LUKSPASSWD" | cryptsetup luksOpen "$DISKNAME2" main
     log_success "Partição '$DISKNAME2' criptografada com sucesso.."
     log_info "Formatando partição '$DISKNAME2' como Btrfs.."
     run mkfs.btrfs /dev/mapper/main
@@ -112,6 +117,7 @@ log_info "Preparando scripts.."
 run mv /root/chroot-setup.sh /mnt/chroot-setup.sh
 run cp /root/logs.sh /mnt/logs.sh
 run cp /root/links.sh /mnt/links.sh
+run cp /root/vars.sh /mnt/vars.sh
 log_success "Scripts gerados com sucesso.."
 echo ""
 read -p "Pressione qualquer tecla para continuar.."
@@ -123,7 +129,9 @@ log_info "Removendo resquícios da instalação.."
 run rm $SCRIPT_DIR/links.sh
 run rm $SCRIPT_DIR/logs.sh
 run rm $SCRIPT_DIR/validations.sh
+run rm $SCRIPT_DIR/vars.sh
 run rm /mnt/chroot-setup.sh
+run rm /mnt/vars.sh
 log_success "Removendo resquícios da instalação.."
 echo ""
 read -n1 -rsp "Pressione qualquer tecla para reiniciar..."
