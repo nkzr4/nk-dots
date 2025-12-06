@@ -1,5 +1,5 @@
 LINKVALIDATIONS="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/validations.sh"
-LINKLOGS="https://https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/logs.sh"
-LINKCHROOT="https://https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/chroot-setup.sh"
+LINKLOGS="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/logs.sh"
+LINKCHROOT="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/chroot-setup.sh"
 LINKHYPRCONF="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/hyprland/hyprland.conf.default"
 LINKFIRSTINIT="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/first-init.sh"
