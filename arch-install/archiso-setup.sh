@@ -1,6 +1,9 @@
 #!/bin/bash
 # archiso-setup.sh - Instalação automatizada do Arch Linux via Arch ISO
 
+# Todo
+# Arrumar automatização de senha do luksFormat e luksOpen
+
 CONTINUE_ON_ERROR=false
 [[ "$1" == "--continue-on-error" ]] && CONTINUE_ON_ERROR=true
 
@@ -21,17 +24,12 @@ source $SCRIPT_DIR/validations.sh
 
 run curl -LO $LINKCHROOT
 run chmod +x /root/chroot-setup.sh
+run cp /root/chroot-setup.sh /mnt/chroot-setup.sh
 
 set -euo pipefail
 
 service_start() {
     validate_internet
-
-    log_info "Preparando scripts.."
-    run mv /root/chroot-setup.sh /mnt/chroot-setup.sh
-    run cp /root/logs.sh /mnt/logs.sh
-    run cp /root/links.sh /mnt/links.sh
-    log_success "Scripts gerados com sucesso.."
 
     log_info "Iniciando coleta de dados..."
     show_header "ETAPA 1 - COLETA DE DADOS"
@@ -110,6 +108,12 @@ show_header "ETAPA 2 - PREPARANDO DISCO BTRFS"
 run service_disk
 
 show_header "ETAPA 3 - ENTRANDO EM CHROOT"
+log_info "Preparando scripts.."
+run mv /root/chroot-setup.sh /mnt/chroot-setup.sh
+run cp /root/logs.sh /mnt/logs.sh
+run cp /root/links.sh /mnt/links.sh
+log_success "Scripts gerados com sucesso.."
+echo ""
 read -p "Pressione qualquer tecla para continuar.."
 echo ""
 run arch-chroot /mnt /bin/bash -c "/chroot-setup.sh"
