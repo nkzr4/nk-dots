@@ -1,10 +1,9 @@
 #!/bin/bash
 # chroot-setup.sh - Preparação do chroot via Arch ISO
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $SCRIPT_DIR/logs.sh
-source $SCRIPT_DIR/vars.sh
-source $SCRIPT_DIR/links.sh
+source /logs.sh
+source /vars.sh
+source /links.sh
 
 set -euo pipefail
 
@@ -58,7 +57,7 @@ service_installer() {
     fi
     log_success "Vendor definido como '$CPU_VENDOR'.."
     log_info "Iniciando instalação.."
-    run pacman -S --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
+    run pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
     log_success "Aplicações e dependências instaladas sucesso.."
     log_info "Ativando serviços.."
     run systemctl enable NetworkManager
@@ -96,11 +95,11 @@ service_boot() {
     run curl -LO $LINKHYPRCONF
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
     run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
-    run cat <<EOF > /home/$USERNAME/.bash_profile
-    if [[ -z \$DISPLAY && \$TTY = /dev/tty1 ]]; then
-        exec Hyprland
-    fi
-    EOF
+cat <<EOF > /home/$USERNAME/.bash_profile
+if [[ -z \$DISPLAY && \$TTY = /dev/tty1 ]]; then
+    exec Hyprland
+fi
+EOF
     run chown $USERNAME:wheel /home/$USERNAME/.bash_profile
     log_success "Configuração do hyprland criada com sucesso.."
     log_info "Saindo de ambiente chroot.."
