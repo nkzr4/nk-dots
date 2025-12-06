@@ -1,149 +1,148 @@
 #!/bin/bash
 # chroot-setup.sh - Preparação do chroot via Arch ISO
 
-log_info() { echo -e "\e[1;34m[ i ]\e[0m $1"; sleep 0.5; }
-log_success() { echo -e "\e[1;32m[ ✓ ]\e[0m $1"; sleep 0.5; }
-log_warning() { echo -e "\e[1;33m[ ⚠ ]\e[0m $1"; sleep 0.5; }
-log_error() { echo -e "\e[1;31m[ ✗ ]\e[0m $1"; sleep 0.5; }
-pause_on_error() {
-    echo ""
-    log_error "Ocorreu um erro de execução do script"
-    read -n1 -rsp "Pressione qualquer tecla para continuar..."
-    clear
-    exit 1
-}
-trap 'pause_on_error' ERR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source $SCRIPT_DIR/logs.sh
+source $SCRIPT_DIR/vars.sh
+source $SCRIPT_DIR/links.sh
 
-validate_vars() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local chroot_script="$script_dir/vars.sh"
-    
+set -euo pipefail
+
+service_user() {
+    log_info "Definindo fuso horário.."
+    run ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+    run hwclock --systohc
     echo ""
-    log_info "Verificando dependências do script..."
-    
-    if [[ -f "$chroot_script" ]]; then
-        log_success "Arquivo 'vars.sh' encontrado em: $script_dir"
-        
-        # Verifica se o arquivo tem permissão de execução
-        if [[ -x "$chroot_script" ]]; then
-            log_success "Arquivo 'vars.sh' possui permissão de execução"
-        else
-            log_warning "Arquivo 'vars.sh' não possui permissão de execução"
-            log_info "Corrigindo permissões..."
-            chmod +x "$chroot_script"
-            log_success "Permissões corrigidas"
-        fi
+    log_success "Fuso horário definido como: $TIMEZONE.."
+    echo ""
+    log_info "Definindo idioma.."
+    run sed -i "s/^#\($LANGUAGE\)/\1/" /etc/locale.gen
+    run locale-gen
+    run echo "LANG=$LANGUAGE" >> /etc/locale.conf
+    echo ""
+    log_success "Idioma definido como: $LANGUAGE.."
+    echo ""
+    log_info "Definindo layout do teclado.."
+    run echo "$KBLAYOUT" >> /etc/vconsole.conf
+    echo ""
+    log_success "Layout definido como: $KBLAYOUT.."
+    echo ""
+    log_info "Definindo nome do computador.."
+    run echo "$PCNAME" >> /etc/hostname
+    echo ""
+    log_success "Nome do computador definido como: $PCNAME.."
+    echo ""
+    log_info "Definindo senha do root.."
+    run echo -e "$ROOTPASSWD\n$ROOTPASSWD" | passwd root
+    echo ""
+    log_success "Senha do root definida com sucesso.."
+    echo ""
+    log_info "Criando usuário.."
+    run useradd -m -g users -G wheel $USERNAME
+    echo ""
+    log_success "Usuário '$USERNAME' criado com sucesso.."
+    echo ""
+    log_info "Definindo senha de $USERNAME.."
+    run echo -e "$USERPASSWD\n$USERPASSWD" | passwd $USERNAME
+    echo ""
+    log_success "Senha de $USERNAME definida com sucesso.."
+    echo ""
+    log_info "Garantindo a $USERNAME permissões de root.."
+    run pacman -Sy --noconfirm sudo
+    run echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
+    echo ""
+    log_success "Permissões garantidas com sucesso.."
+}
+
+service_installer() {
+    log_info "Preparando repositórios.."
+    run curl -O https://download.sublimetext.com/sublimehq-pub.gpg
+    run pacman-key --add sublimehq-pub.gpg
+    run pacman-key --lsign-key 8A8F901A
+    run rm sublimehq-pub.gpg
+    run echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" >> /etc/pacman.conf
+    run sed -i 's/^#\[multilib\]/[multilib]/' /etc/pacman.conf
+    run sed -i '/^\[multilib\]/{n;s/^#Include/Include/}' /etc/pacman.conf	
+    echo ""
+    log_success "Repositórios adicionados com sucesso.."
+    echo ""
+    log_info "Definindo vendor do processador.."
+    CPU_VENDOR=$(lscpu | grep "Vendor ID" | awk '{print $3}')
+    if [[ $CPU_VENDOR == "GenuineIntel" ]]; then
+        cpu="intel-ucode"
     else
-        log_error "Arquivo 'vars.sh' NÃO encontrado no diretório: $script_dir"
-        log_error "O arquivo 'vars.sh' deve estar no mesmo diretório deste script"
-        echo ""
-        log_info "Estrutura esperada:"
-        echo "  $(basename "$0")"
-        echo "  vars.sh  <- FALTANDO"
-        echo ""
-        exit 1
+        cpu="amd-ucode"
     fi
+    log_success "Vendor definido como '$CPU_VENDOR'.."
+    echo ""
+    log_info "Iniciando instalação.."
+    run pacman -S --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
+    echo ""
+    log_success "Aplicações e dependências instaladas sucesso.."
+    echo ""
+    log_info "Ativando serviços.."
+    run systemctl enable NetworkManager
+    run systemctl enable bluetooth
+    run systemctl enable sshd
+    run systemctl enable firewalld
+    run systemctl enable fstrim.timer
+    run systemctl enable acpid
+    echo ""
+    log_success "Serviços ativados com sucesso.."
 }
 
-clear
-echo ""
-echo "╭──────────────────────────────────────────────────────────────────────╮"
-echo "│                  ETAPA 3 - CONFIGURAÇÃO DE USUÁRIO                   │"
-echo "╰──────────────────────────────────────────────────────────────────────╯"
-echo ""
+service_boot() {
+    log_info "Configurando mkinitcpio.conf.."
+    run sed -i 's/^MODULES=.*/MODULES=(btrfs)/' /etc/mkinitcpio.conf
+    run sed -i '/^HOOKS=/ s/filesystems/sd-encrypt filesystems/' /etc/mkinitcpio.conf
+    run mkinitcpio -p linux
+    echo ""
+    log_success "mkinitcpio concluído com sucesso.."
+    echo ""
+    log_info "Configurando GRUB.."
+    run grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+    run grub-mkconfig -o /boot/grub/grub.cfg
+    run DISK_LUKS_UUID=$(blkid -s UUID -o value $DISKNAME2)
+    run sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
+    run grub-mkconfig -o /boot/grub/grub.cfg
+    echo ""
+    log_success "GRUB configurado com sucesso.."
+    echo ""
+    log_info "Configurando script de primeira inicialização.."
+    run mkdir -p /home/$USERNAME/.config/{nk-dots,hypr}
+    run chown -R $USERNAME:wheel /home/$USERNAME/.config
+    run curl -LO $LINKFIRSTINIT
+    run mv /first-init.sh /home/$USERNAME/.config/nk-dots/first-init.sh
+    run chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
+    run cp /logs.sh /home/$USERNAME/.config/nk-dots/logs.sh
+    run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
+    echo ""
+    log_success "Script preparado com sucesso.."
+    echo ""
+    log_info "Finalizando preparação.."
+    run curl -LO $LINKHYPRCONF
+    run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
+    run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
+    run cat <<EOF > /home/$USERNAME/.bash_profile
+    if [[ -z \$DISPLAY && \$TTY = /dev/tty1 ]]; then
+        exec Hyprland
+    fi
+    EOF
+    run chown $USERNAME:wheel /home/$USERNAME/.bash_profile
+    echo ""
+    log_success "Configuração do hyprland criada com sucesso.."
+    echo ""
+    log_info "Saindo de ambiente chroot.."
+}
 
-log_info "Carregando pré definições.."
-validate_vars
-source /vars.sh
-echo ""
+cd
+show_header "ETAPA 4 - CONFIGURAÇÕES DO USUÁRIO"
+run service_user
 
-log_info "Definindo confiugurações.."
-ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
-hwclock --systohc
-sed -i "s/^#\($LANGUAGE\)/\1/" /etc/locale.gen
-locale-gen
-echo "LANG=$LANGUAGE" >> /etc/locale.conf
-echo "$KBLAYOUT" >> /etc/vconsole.conf
-echo "$PCNAME" >> /etc/hostname
-echo -e "$ROOTPASSWD\n$ROOTPASSWD" | passwd root
-useradd -m -g users -G wheel $USERNAME
-echo -e "$USERPASSWD\n$USERPASSWD" | passwd $USERNAME
-pacman -S --noconfirm sudo
-echo "$USERNAME ALL=(ALL) ALL" >> /etc/sudoers.d/$USERNAME
+show_header "ETAPA 5 - INSTALANDO APLICAÇÕES"
+run service_installer
 
-echo ""
-echo "╭──────────────────────────────────────────────────────────────────────╮"
-echo "│              ETAPA 4 - INSTALANDO PACOTES E APLICATIVOS              │"
-echo "╰──────────────────────────────────────────────────────────────────────╯"
-echo ""
-
-log_info "Preparando repositórios.."
-curl -O https://download.sublimetext.com/sublimehq-pub.gpg
-pacman-key --add sublimehq-pub.gpg
-pacman-key --lsign-key 8A8F901A
-rm sublimehq-pub.gpg
-echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" >> /etc/pacman.conf
-sed -i 's/^#\[multilib\]/[multilib]/' /etc/pacman.conf
-sed -i '/^\[multilib\]/{n;s/^#Include/Include/}' /etc/pacman.conf	
-echo ""
-
-log_info "Definindo arquitetura do processador.."
-CPU_VENDOR=$(lscpu | grep "Vendor ID" | awk '{print $3}')
-if [[ $CPU_VENDOR == "GenuineIntel" ]]; then
-    cpu="intel-ucode"
-else
-    cpu="amd-ucode"
-fi
-
-log_info "Iniciando instalação.."
-pacman -Sy base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
-
-echo ""
-echo "╭──────────────────────────────────────────────────────────────────────╮"
-echo "│             ETAPA 5 - CONFIGURANDO PRIMEIRA INICIALIZAÇÃO            │"
-echo "╰──────────────────────────────────────────────────────────────────────╯"
-echo ""
-
-log_info "Configurando mkinitcpio.conf.."
-sed -i 's/^MODULES=.*/MODULES=(btrfs)/' /etc/mkinitcpio.conf
-sed -i '/^HOOKS=/ s/filesystems/sd-encrypt filesystems/' /etc/mkinitcpio.conf
-mkinitcpio -p linux
-echo ""
-
-log_info "Configurando GRUB.."
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-grub-mkconfig -o /boot/grub/grub.cfg
-DISK_LUKS_UUID=$(blkid -s UUID -o value $DISKNAME2)
-sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
-grub-mkconfig -o /boot/grub/grub.cfg
-
-log_info "Configurando scripts.."
-mkdir -p /home/$USERNAME/.config/nk-dots
-curl -LO https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-install/first-init.sh
-mv /first-init.sh /home/$USERNAME/.config/nk-dots/first-init.sh
-chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
-chown -R $USERNAME:$USERNAME /home/$USERNAME/.config/nk-dots
-
-log_info "Ativando serviços.."
-systemctl enable NetworkManager
-systemctl enable bluetooth
-systemctl enable sshd
-systemctl enable firewalld
-systemctl enable fstrim.timer
-systemctl enable acpid
-
-log_info "Finalizando preparação.."
-curl -LO https://https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/hyprland/hyprland.conf.default
-mkdir -p /home/$USERNAME/.config/hypr
-mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
-chown $USERNAME:$USERNAME /home/$USERNAME/.config/hypr/hyprland.conf
-cat <<EOF > /home/$USERNAME/.bash_profile
-if [[ -z \$DISPLAY && \$TTY = /dev/tty1 ]]; then
-    exec Hyprland
-fi
-EOF
-chown $USERNAME:$USERNAME /home/$USERNAME/.bash_profile
-
-log_info "Saindo de ambiente chroot.."
+show_header "ETAPA 6 - PREPARANDO INICIALIZAÇÃO"
+run service_boot
 
 exit
