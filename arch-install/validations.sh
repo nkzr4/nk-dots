@@ -170,7 +170,7 @@ validate_pcname() {
         read -p "Digite o nome do computador (default: nkarch) " PCNAME
         check_exit "$PCNAME"
         if [[ -z "$PCNAME" ]]; then
-            $PCNAME="nkarch"
+            PCNAME="nkarch"
             log_success "Hostname padrão '$PCNAME' definido com sucesso.."
             break
         fi
@@ -192,7 +192,7 @@ validate_username() {
         read -p "Digite o nome do usuário (default: nkzr4): " USERNAME
         check_exit "$USERNAME"
         if [[ -z "$USERNAME" ]]; then
-            $USERNAME="nkzr4"
+            USERNAME="nkzr4"
             log_success "Usuário padrão '$USERNAME' definido com sucesso.."
             break
         fi
@@ -311,27 +311,25 @@ validate_overview () {
         exit 1
     fi
     log_info "Exportando variáveis.."
-    cat <<EOF > /mnt/vars.sh
-    KBLAYOUT="$KBLAYOUT"
-    TIMEZONE="$TIMEZONE"
-    WIFIPASSWD="$WIFIPASSWD"
-    WIFINAME="$WIFINAME"
-    DISKNAME="$DISKNAME"
-    DISK="$DISK"
-    DISKNAME1="$DISKNAME1"
-    DISKNAME2="$DISKNAME2" 
-    LANGUAGE="$LANGUAGE"
-    PCNAME="$PCNAME"
-    ROOTPASSWD="$ROOTPASSWD"
-    USERNAME="$USERNAME"
-    USERPASSWD="$USERPASSWD"
-    EOF
-    run chmod +x /mnt/vars.sh
-    echo ""
+cat <<EOF > $SCRIPT_DIR/vars.sh
+KBLAYOUT="$KBLAYOUT"
+TIMEZONE="$TIMEZONE"
+WIFIPASSWD="$WIFIPASSWD"
+WIFINAME="$WIFINAME"
+DISKNAME="$DISKNAME"
+DISK="$DISK"
+DISKNAME1="$DISKNAME1"
+DISKNAME2="$DISKNAME2" 
+LANGUAGE="$LANGUAGE"
+PCNAME="$PCNAME"
+ROOTPASSWD="$ROOTPASSWD"
+USERNAME="$USERNAME"
+USERPASSWD="$USERPASSWD"
+LUKSPASSWD="$LUKSPASSWD"
+EOF
+    cp $SCRIPT_DIR/vars.sh /mnt/vars.sh
+    chmod +x /mnt/vars.sh
     log_success "Variáveis exportadas para 'vars.sh' com sucesso.."
-    echo ""
-
     log_success "Informações confirmadas. Iniciando instalação..."
-    echo ""
 }
 
