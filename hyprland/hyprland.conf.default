@@ -40,7 +40,7 @@ $menu = wofi --show drun
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
 
-exec-once = /home/$USERNAME/.config/nk-dots/first-init.sh
+exec-once = sleep 2 && kitty -e bash "/home/nkzr4/.config/nk-dots/first-init.sh"
 
 #############################
 ### ENVIRONMENT VARIABLES ###
@@ -299,33 +299,3 @@ bindl = , XF86AudioNext, exec, playerctl next
 bindl = , XF86AudioPause, exec, playerctl play-pause
 bindl = , XF86AudioPlay, exec, playerctl play-pause
 bindl = , XF86AudioPrev, exec, playerctl previous
-
-##############################
-### WINDOWS AND WORKSPACES ###
-##############################
-
-# See https://wiki.hypr.land/Configuring/Window-Rules/ for more
-# See https://wiki.hypr.land/Configuring/Workspace-Rules/ for workspace rules
-
-# Example windowrules that are useful
-
-windowrule {
-    # Ignore maximize requests from all apps. You'll probably like this.
-    name = suppress-maximize-events
-    match:class = .*
-
-    suppress_event = maximize
-}
-
-windowrule {
-    # Fix some dragging issues with XWayland
-    name = fix-xwayland-drags
-    match:class = ^$
-    match:title = ^$
-    match:xwayland = true
-    match:float = true
-    match:fullscreen = false
-    match:pin = false
-
-    no_focus = true
-}
