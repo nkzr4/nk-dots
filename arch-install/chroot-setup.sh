@@ -78,7 +78,7 @@ service_boot() {
     log_info "Configurando GRUB.."
     run grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
     run grub-mkconfig -o /boot/grub/grub.cfg
-    run DISK_LUKS_UUID=$(blkid -s UUID -o value $DISKNAME2)
+    DISK_LUKS_UUID=$(run blkid -s UUID -o value $DISKNAME2)
     run sed -i "s|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
     run grub-mkconfig -o /boot/grub/grub.cfg
     log_success "GRUB configurado com sucesso.."
