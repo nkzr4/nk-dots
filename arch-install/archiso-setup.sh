@@ -124,9 +124,6 @@ run cp /root/logs.sh /mnt/logs.sh
 run cp /root/links.sh /mnt/links.sh
 run cp /root/vars.sh /mnt/vars.sh
 log_success "Scripts gerados com sucesso.."
-echo ""
-read -p "Pressione qualquer tecla para continuar.."
-echo ""
 run arch-chroot /mnt /bin/bash -c "/chroot-setup.sh"
 
 show_header "INSTALAÇÃO DO ARCH LINUX FINALZIADA"
@@ -138,6 +135,4 @@ run rm /mnt/chroot-setup.sh
 run rm /mnt/vars.sh
 run rm /mnt/logs.sh
 run rm /mnt/links.sh
-echo ""
-read -n1 -rsp "Pressione qualquer tecla para reiniciar..."
 run reboot
