@@ -4,6 +4,7 @@
 # Todo
 # Criar log de input
 # Remover espaços desnecessários
+# Definir uma senha para tudo
 
 CONTINUE_ON_ERROR=false
 [[ "$1" == "--continue-on-error" ]] && CONTINUE_ON_ERROR=true
@@ -33,6 +34,7 @@ run curl -LO $LINKHYPRCONF
 
 set -euo pipefail
 
+validate_internet
 validate_scripts
 
 service_start() {
@@ -44,8 +46,6 @@ service_start() {
     run validate_pcname
     run validate_username
     run validate_rootpasswd
-    run validate_userpasswd
-    run validate_luks_passwd
     run validate_diskname
     run validate_overview
 
