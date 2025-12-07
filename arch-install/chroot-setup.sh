@@ -96,19 +96,24 @@ service_boot() {
     run mkdir -p /home/$USERNAME/.config/systemd/user
 cat <<EOF > /home/$USERNAME/.config/systemd/user/hyprland.service
 [Unit]
-Description=Start Hyprland using UWSM
-After=graphical-session.target
+Description=Start Hyprland via UWSM
+After=graphical-session-pre.target
+Wants=graphical-session-pre.target
 
 [Service]
+Type=exec
 ExecStart=/usr/bin/uwsm start hyprland
 Restart=on-failure
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=Hyprland
+Environment=WLR_NO_HARDWARE_CURSORS=1
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
 EOF
     run chown -R $USERNAME:wheel /home/$USERNAME/.config/systemd
-    run mkdir -p /home/$USERNAME/.config/systemd/user/default.target.wants
-    run ln -sf ../hyprland.service /home/$USERNAME/.config/systemd/user/default.target.wants/hyprland.service
+    run mkdir -p /home/$USERNAME/.config/systemd/user/graphical-session.target.wants
+    run ln -sf ../hyprland.service /home/$USERNAME/.config/systemd/user/graphical-session.target.wants/hyprland.service
     log_success "Serviço do Hyprland habilitado com sucesso."
     log_success "Configuração do hyprland criada com sucesso.."
     log_info "Saindo de ambiente chroot.."
