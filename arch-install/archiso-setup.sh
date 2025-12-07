@@ -10,10 +10,6 @@ CONTINUE_ON_ERROR=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-set -euo pipefail
-
-validate_internet
-
 LINKS="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/links.sh"
 curl -LO $LINKS
 chmod +x $SCRIPT_DIR/links.sh
@@ -31,9 +27,11 @@ run curl -LO $LINKCHROOT
 run chmod +x /root/chroot-setup.sh
 
 run curl -LO $LINKFIRSTINIT
-run chmod +x /root/fisrt-init.sh
+run chmod +x /root/first-init.sh
 
 run curl -LO $LINKHYPRCONF
+
+set -euo pipefail
 
 validate_scripts
 
@@ -120,7 +118,7 @@ run service_disk
 show_header "ETAPA 3 - ENTRANDO EM CHROOT"
 log_info "Preparando scripts.."
 run mv /root/chroot-setup.sh /mnt/chroot-setup.sh
-run mv /root/fisrt-init.sh /mnt/fisrt-init.sh
+run mv /root/first-init.sh /mnt/first-init.sh
 run mv /root/hyprland.conf.default /mnt/hyprland.conf.default
 run cp /root/logs.sh /mnt/logs.sh
 run cp /root/links.sh /mnt/links.sh
