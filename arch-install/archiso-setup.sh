@@ -34,6 +34,8 @@ run curl -LO $LINKHYPRCONF
 
 set -euo pipefail
 
+show_header "INICIANDO INSTALAÇÃO DO ARCH LINUX"
+
 validate_internet
 validate_scripts
 
