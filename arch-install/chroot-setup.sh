@@ -66,6 +66,7 @@ service_installer() {
     run systemctl enable firewalld
     run systemctl enable fstrim.timer
     run systemctl enable acpid
+    run systemctl enable uwsm
     log_success "Serviços ativados com sucesso.."
 }
 
@@ -93,12 +94,21 @@ service_boot() {
     log_info "Finalizando preparação.."
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
     run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
-cat <<EOF > /home/$USERNAME/.bash_profile
-if [[ -z \$DISPLAY && \$TTY = /dev/tty1 ]]; then
-    exec Hyprland
-fi
+    run mkdir -p /home/$USERNAME/.config/systemd/user
+cat <<EOF > /home/$USERNAME/.config/systemd/user/hyprland.service
+[Unit]
+Description=Start Hyprland on login
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/uwsm start hyprland
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
 EOF
-    run chown $USERNAME:wheel /home/$USERNAME/.bash_profile
+    run chown -R $USERNAME:wheel /home/$USERNAME/.config/systemd
+    run systemctl enable hyprland.service
     log_success "Configuração do hyprland criada com sucesso.."
     log_info "Saindo de ambiente chroot.."
 }
