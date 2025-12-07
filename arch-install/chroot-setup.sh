@@ -90,7 +90,7 @@ service_boot() {
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
     run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_success "Script preparado com sucesso.."
-    log_info "Finalizando preparação.."
+    log_info "Criando serviço do Hyprland usando UWSM..."
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
     run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
     run mkdir -p /home/$USERNAME/.config/systemd/user
@@ -107,8 +107,9 @@ Restart=on-failure
 WantedBy=default.target
 EOF
     run chown -R $USERNAME:wheel /home/$USERNAME/.config/systemd
-    run sudo -u $USERNAME systemctl --user enable hyprland.service
-    run systemctl enable hyprland.service
+    run mkdir -p /home/$USERNAME/.config/systemd/user/default.target.wants
+    run ln -sf ../hyprland.service /home/$USERNAME/.config/systemd/user/default.target.wants/hyprland.service
+    log_success "Serviço do Hyprland habilitado com sucesso."
     log_success "Configuração do hyprland criada com sucesso.."
     log_info "Saindo de ambiente chroot.."
 }
