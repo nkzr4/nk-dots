@@ -4,6 +4,47 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $SCRIPT_DIR/logs.sh
 
+validate_scripts() {
+    log_info "Verificando downloads de scripts..."
+    if [[ ! -f "$SCRIPT_DIR/links.sh" ]]; then
+        log_success "Arquivo 'links.sh' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    if [[ ! -f "$SCRIPT_DIR/logs.sh" ]]; then
+        log_success "Arquivo 'logs.sh' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    if [[ ! -f "$SCRIPT_DIR/validations.sh" ]]; then
+        log_success "Arquivo 'validations.sh' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    if [[ ! -f "$SCRIPT_DIR/chroot-setup.sh" ]]; then
+        log_success "Arquivo 'chroot-setup.sh' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    if [[ ! -f "$SCRIPT_DIR/fisrt-init.sh" ]]; then
+        log_success "Arquivo 'fisrt-init.sh' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    if [[ ! -f "$SCRIPT_DIR/hyprland.conf.default" ]]; then
+        log_success "Arquivo 'hyprland.conf.default' não encontrado. Verifique sua conexão com a internet.."
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
+        exit 1
+    fi
+    log_success "Scripts carregados com sucesso..."
+}
+
 validate_internet() {
     log_info "Verificando conexão com a internet..."
     if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
@@ -90,18 +131,6 @@ validate_timezone() {
             TIMEZONE="America/Recife"
             log_success "Fuso horário padrão '$TIMEZONE' definido com sucesso.."
             break
-        fi
-        log_info "Definindo fuso horário.."
-        if timedatectl list-timezones | grep -qx "$TIMEZONE"; then
-            log_success "Timezone '$TIMEZONE' definido com sucesso.."
-            break
-        else
-            log_error "Timezone '$TIMEZONE' não encontrado. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
-            continue
-        fi
-    done
 }
 
 validate_diskname() {
@@ -327,8 +356,7 @@ USERNAME="$USERNAME"
 USERPASSWD="$USERPASSWD"
 LUKSPASSWD="$LUKSPASSWD"
 EOF
-    cp $SCRIPT_DIR/vars.sh /mnt/vars.sh
-    chmod +x /mnt/vars.sh
+    chmod +x $SCRIPT_DIR/vars.sh
     log_success "Variáveis exportadas para 'vars.sh' com sucesso.."
     log_success "Informações confirmadas. Iniciando instalação..."
 }
