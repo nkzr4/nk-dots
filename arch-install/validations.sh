@@ -86,14 +86,10 @@ validate_internet() {
                 break
             else
                 log_error "Conexão estabelecida mas sem acesso à internet. Tente novamente.."
-                echo ""
-                read -p "Pressione qualquer tecla para continuar.."
                 continue
             fi
         else
             log_error "Falha ao conectar. Verifique o nome da rede e a senha e tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -115,8 +111,6 @@ validate_kblayout() {
             break
         else
             log_error "Layout '$KBLAYOUT' não encontrado. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -138,8 +132,6 @@ validate_timezone() {
             break
         else
             log_error "Fuso horário '$TIMEZONE' não encontrado. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -154,8 +146,6 @@ validate_diskname() {
         check_exit "$DISKNAME"
         if [[ -z "$DISKNAME" ]]; then
             log_error "O nome do disco não pode ser vazio. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
         if lsblk -d -o NAME | grep -qx "$DISKNAME"; then
@@ -174,8 +164,6 @@ validate_diskname() {
             fi
         else
             log_error "Disco '$DISKNAME' não encontrado. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -184,10 +172,10 @@ validate_diskname() {
 validate_language() {
     while true; do
         log_info "Defina o idioma do sistema..."
-        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US.UTF-8): " LANGUAGE
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US): " LANGUAGE
         check_exit "$LANGUAGE"
         if [[ -z "$LANGUAGE" ]]; then
-            LANGUAGE="en_US.UTF-8"
+            LANGUAGE="en_US"
             log_success "Idioma padrão '$LANGUAGE' definido com sucesso.."
             break
         fi
@@ -196,8 +184,6 @@ validate_language() {
             break
         else
             log_error "Idioma '$LANGUAGE' não encontrado. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -218,8 +204,6 @@ validate_pcname() {
             break
         else
             log_error "Nome inválido. Use apenas letras, números e hífen.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -240,8 +224,6 @@ validate_username() {
             break
         else
             log_error "Nome inválido. Use letras minúsculas, números, underline e hífen.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -254,8 +236,6 @@ validate_rootpasswd() {
         check_exit "$ROOTPASSWD"
         if [[ -z "$ROOTPASSWD" ]]; then
             log_error "A senha do root não pode ser vazia. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
         echo ""
@@ -264,7 +244,7 @@ validate_rootpasswd() {
         echo ""
         if [[ "$ROOTPASSWD" == "$ROOTPASSWD_CONFIRM" ]]; then
             read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Deseja atribuir a mesma senha para o usuário e criptografia? (s/N): " confirm
-            if [[ "$confirm" == "s" || "$confirm" == "S" ]]; then
+            if [[ -z "$confirm" || "$confirm" == "s" || "$confirm" == "S" ]]; then
                 LUKSPASSWD="$ROOTPASSWD"
                 USERPASSWD="$ROOTPASSWD"
                 log_success "Senha do root, usuário e criptografia definidas com sucesso.."
@@ -277,8 +257,6 @@ validate_rootpasswd() {
             fi
         else
             log_error "As senhas não coincidem. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -291,8 +269,6 @@ validate_userpasswd() {
         check_exit "$USERPASSWD"
         if [[ -z "$USERPASSWD" ]]; then
             log_error "A senha do usuário não pode ser vazia. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
         echo ""
@@ -304,8 +280,6 @@ validate_userpasswd() {
             break
         else
             log_error "As senhas não coincidem. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
@@ -318,8 +292,6 @@ validate_luks_passwd() {
         check_exit "$LUKSPASSWD"
         if [[ -z "$LUKSPASSWD" ]]; then
             log_error "A senha LUKS não pode ser vazia. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
         echo ""
@@ -328,12 +300,9 @@ validate_luks_passwd() {
         echo ""
         if [[ "$LUKSPASSWD" == "$LUKSPASSWD_CONFIRM" ]]; then
             log_success "Senha LUKS definida com sucesso.."
-            echo ""
             break
         else
             log_error "As senhas não coincidem. Tente novamente.."
-            echo ""
-            read -p "Pressione qualquer tecla para continuar.."
             continue
         fi
     done
