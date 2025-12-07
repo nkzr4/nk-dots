@@ -66,13 +66,13 @@ validate_internet() {
         run iwctl station "$device" scan
         sleep 2
         run iwctl station "$device" get-networks
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o nome da rede WiFi (SSID): " WIFINAME
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome da rede WiFi (SSID): " WIFINAME
         check_exit "$WIFINAME"
         if [[ -z "$WIFINAME" ]]; then
             log_error "O nome da rede WiFi não pode ser vazio. Tente novamente..."
             continue
         fi
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite a senha da rede WiFi: " WIFIPASSWD
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite a senha da rede WiFi: " WIFIPASSWD
         check_exit "$WIFIPASSWD"
         if [[ -z "$WIFIPASSWD" ]]; then
             log_error "A senha da rede WiFi não pode ser vazia. Tente novamente.."
@@ -102,7 +102,7 @@ validate_internet() {
 validate_kblayout() {
     while true; do
         log_info "Defina o layout do seu teclado..."
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o layout do teclado (default: br-abnt2): " KBLAYOUT
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o layout do teclado (default: br-abnt2): " KBLAYOUT
         check_exit "$KBLAYOUT"
         if [[ -z "$KBLAYOUT" ]]; then
             KBLAYOUT="br-abnt2"
@@ -125,7 +125,7 @@ validate_kblayout() {
 validate_timezone() {
     while true; do
         log_info "Defina o seu fuso horário..."
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o timezone (default: America/Recife): " TIMEZONE
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o timezone (default: America/Recife): " TIMEZONE
         check_exit "$TIMEZONE"
         if [[ -z "$TIMEZONE" ]]; then
             TIMEZONE="America/Recife"
@@ -152,7 +152,7 @@ validate_diskname() {
         echo ""
         log_warning "ATENÇÃO: O disco selecionado será completamente APAGADO!"
         echo ""
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do disco (ex: sda, nvme0n1): " DISKNAME
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do disco (ex: sda, nvme0n1): " DISKNAME
         check_exit "$DISKNAME"
         if [[ -z "$DISKNAME" ]]; then
             log_error "O nome do disco não pode ser vazio. Tente novamente.."
@@ -161,7 +161,7 @@ validate_diskname() {
             continue
         fi
         if lsblk -d -o NAME | grep -qx "$DISKNAME"; then
-            read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Confirma o uso do disco /dev/$DISKNAME? (digite 'SIM' em caixa alta): " confirm
+            read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirma o uso do disco /dev/$DISKNAME? (digite 'SIM' em caixa alta): " confirm
             if [[ "$confirm" == "SIM" ]]; then
                 DISK="/dev/$DISKNAME"
                 DISKNAME1="${DISK}1"
@@ -186,7 +186,7 @@ validate_diskname() {
 validate_language() {
     while true; do
         log_info "Defina o idioma do sistema..."
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US.UTF-8): " LANGUAGE
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US.UTF-8): " LANGUAGE
         check_exit "$LANGUAGE"
         if [[ -z "$LANGUAGE" ]]; then
             LANGUAGE="en_US.UTF-8"
@@ -208,7 +208,7 @@ validate_language() {
 validate_pcname() {
     while true; do
         log_info "Definindo hostname..."
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do computador (default: nkarch) " PCNAME
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do computador (default: nkarch) " PCNAME
         check_exit "$PCNAME"
         if [[ -z "$PCNAME" ]]; then
             PCNAME="nkarch"
@@ -230,7 +230,7 @@ validate_pcname() {
 validate_username() {
     while true; do
         log_info "Definindo senha nome do usuário..."
-        read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do usuário (default: nkzr4): " USERNAME
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do usuário (default: nkzr4): " USERNAME
         check_exit "$USERNAME"
         if [[ -z "$USERNAME" ]]; then
             USERNAME="nkzr4"
@@ -252,7 +252,7 @@ validate_username() {
 validate_rootpasswd() {
     while true; do
         log_info "Definindo senha do root..."
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite a senha do root: " ROOTPASSWD
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite a senha do root: " ROOTPASSWD
         check_exit "$ROOTPASSWD"
         if [[ -z "$ROOTPASSWD" ]]; then
             log_error "A senha do root não pode ser vazia. Tente novamente.."
@@ -261,11 +261,11 @@ validate_rootpasswd() {
             continue
         fi
         echo ""
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha do root: " ROOTPASSWD_CONFIRM
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha do root: " ROOTPASSWD_CONFIRM
         check_exit "$ROOTPASSWD_CONFIRM"
         echo ""
         if [[ "$ROOTPASSWD" == "$ROOTPASSWD_CONFIRM" ]]; then
-            read -p $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Deseja atribuir a mesma senha para o usuário e criptografia? (s/N): " confirm
+            read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Deseja atribuir a mesma senha para o usuário e criptografia? (s/N): " confirm
             if [[ "$confirm" == "s" || "$confirm" == "S" ]]; then
                 LUKSPASSWD="$ROOTPASSWD"
                 USERPASSWD="$ROOTPASSWD"
@@ -289,7 +289,7 @@ validate_rootpasswd() {
 validate_userpasswd() {
     while true; do
         log_info "Definindo senha do usuário..."
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite a senha do usuário '$USERNAME': " USERPASSWD
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite a senha do usuário '$USERNAME': " USERPASSWD
         check_exit "$USERPASSWD"
         if [[ -z "$USERPASSWD" ]]; then
             log_error "A senha do usuário não pode ser vazia. Tente novamente.."
@@ -298,7 +298,7 @@ validate_userpasswd() {
             continue
         fi
         echo ""
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha do usuário: " USERPASSWD_CONFIRM
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha do usuário: " USERPASSWD_CONFIRM
         check_exit "$USERPASSWD_CONFIRM"
         echo ""
         if [[ "$USERPASSWD" == "$USERPASSWD_CONFIRM" ]]; then
@@ -316,7 +316,7 @@ validate_userpasswd() {
 validate_luks_passwd() {
     while true; do
         log_info "Definindo senha de criptografia..."
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Digite a senha para criptografia LUKS: " LUKSPASSWD
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite a senha para criptografia LUKS: " LUKSPASSWD
         check_exit "$LUKSPASSWD"
         if [[ -z "$LUKSPASSWD" ]]; then
             log_error "A senha LUKS não pode ser vazia. Tente novamente.."
@@ -325,7 +325,7 @@ validate_luks_passwd() {
             continue
         fi
         echo ""
-        read -sp $'\033[0m[\033[1;36m INPUT \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha LUKS: " LUKSPASSWD_CONFIRM
+        read -sp $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirme a senha LUKS: " LUKSPASSWD_CONFIRM
         check_exit "$LUKSPASSWD_CONFIRM"
         echo ""
         if [[ "$LUKSPASSWD" == "$LUKSPASSWD_CONFIRM" ]]; then
