@@ -149,9 +149,7 @@ validate_diskname() {
     while true; do
         log_info "Defina o disco para instalação..."
         lsblk -d -o NAME,SIZE,TYPE,MODEL
-        echo ""
         log_warning "ATENÇÃO: O disco selecionado será completamente APAGADO!"
-        echo ""
         read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do disco (ex: sda, nvme0n1): " DISKNAME
         check_exit "$DISKNAME"
         if [[ -z "$DISKNAME" ]]; then
@@ -353,7 +351,7 @@ validate_overview () {
     echo "  Hostname: $PCNAME"
     echo "  Usuário: $USERNAME"
     echo ""
-    read -p "Confirma as configurações e deseja prosseguir? (s/N): " final_confirm
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirma as configurações e deseja prosseguir? (s/N): " final_confirm
     echo ""
     if [[ "$final_confirm" != "s" ]] && [[ "$final_confirm" != "S" ]]; then
         log_warning "Instalação cancelada pelo usuário.."
