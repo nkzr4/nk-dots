@@ -132,6 +132,17 @@ validate_timezone() {
             log_success "Fuso horário padrão '$TIMEZONE' definido com sucesso.."
             break
         fi
+        log_info "Definindo fuso horário.."
+        if timedatectl list-timezones | grep -qx "$TIMEZONE"; then
+            log_success "Fuso horário '$TIMEZONE' definido com sucesso.."
+            break
+        else
+            log_error "Fuso horário '$TIMEZONE' não encontrado. Tente novamente.."
+            echo ""
+            read -p "Pressione qualquer tecla para continuar.."
+            continue
+        fi
+    done
 }
 
 validate_diskname() {
