@@ -7,37 +7,37 @@ source $SCRIPT_DIR/logs.sh
 validate_scripts() {
     log_info "Verificando downloads de scripts..."
     if [[ ! -f "$SCRIPT_DIR/links.sh" ]]; then
-        log_success "Arquivo 'links.sh' não encontrado. Verifique sua conexão com a internet.."
+        log_error "Arquivo 'links.sh' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
     if [[ ! -f "$SCRIPT_DIR/logs.sh" ]]; then
-        log_success "Arquivo 'logs.sh' não encontrado. Verifique sua conexão com a internet.."
+        log_error "Arquivo 'logs.sh' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
     if [[ ! -f "$SCRIPT_DIR/validations.sh" ]]; then
-        log_success "Arquivo 'validations.sh' não encontrado. Verifique sua conexão com a internet.."
+        log_error "Arquivo 'validations.sh' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
     if [[ ! -f "$SCRIPT_DIR/chroot-setup.sh" ]]; then
-        log_success "Arquivo 'chroot-setup.sh' não encontrado. Verifique sua conexão com a internet.."
+        log_error "Arquivo 'chroot-setup.sh' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
-    if [[ ! -f "$SCRIPT_DIR/fisrt-init.sh" ]]; then
-        log_success "Arquivo 'fisrt-init.sh' não encontrado. Verifique sua conexão com a internet.."
+    if [[ ! -f "$SCRIPT_DIR/first-init.sh" ]]; then
+        log_error "Arquivo 'first-init.sh' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
     if [[ ! -f "$SCRIPT_DIR/hyprland.conf.default" ]]; then
-        log_success "Arquivo 'hyprland.conf.default' não encontrado. Verifique sua conexão com a internet.."
+        log_error "Arquivo 'hyprland.conf.default' não encontrado. Verifique sua conexão com a internet.."
         echo ""
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
@@ -131,6 +131,7 @@ validate_timezone() {
             TIMEZONE="America/Recife"
             log_success "Fuso horário padrão '$TIMEZONE' definido com sucesso.."
             break
+        fi
 }
 
 validate_diskname() {
