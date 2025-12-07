@@ -84,15 +84,13 @@ service_boot() {
     log_success "GRUB configurado com sucesso.."
     log_info "Configurando script de primeira inicialização.."
     run mkdir -p /home/$USERNAME/.config/{nk-dots,hypr}
-    run chown -R $USERNAME:wheel /home/$USERNAME/.config
-    run curl -LO $LINKFIRSTINIT
     run mv /first-init.sh /home/$USERNAME/.config/nk-dots/first-init.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
     run cp /logs.sh /home/$USERNAME/.config/nk-dots/logs.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
+    run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_success "Script preparado com sucesso.."
     log_info "Finalizando preparação.."
-    run curl -LO $LINKHYPRCONF
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
     run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
 cat <<EOF > /home/$USERNAME/.bash_profile
