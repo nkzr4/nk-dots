@@ -60,26 +60,24 @@ pause_on_error() {
     local cmd="$2"
     local line="$3"
 
-    echo ""
-    echo "────────────────────────────────────────────────────────────────────────────────────────────"
+    echo "────────────────────────────────────────────────────────────────────────"
     log_error "Ocorreu um erro na execução do script:"
     log_info "Comando: $cmd"
     log_info "Código:  $exit_code"
     log_info "Linha:   $line"
 
     {
-        echo "────────────────────────────────────────────────────────────────────────────────────────────"
+        echo "────────────────────────────────────────────────────────────────────────"
         echo "Data: $(date '+%Y-%m-%d %H:%M:%S')"
         echo "Script: $0"
         echo "PWD: $PWD"
         echo "Comando com falha: $cmd"
         echo "Código de saída:   $exit_code"
         echo "Linha do erro:     $line"
-        echo "────────────────────────────────────────────────────────────────────────────────────────────"
+        echo "────────────────────────────────────────────────────────────────────────"
     } >> "$LOG_FILE"
 
     log_warning "O erro foi registrado em: $LOG_FILE"
-    echo ""
 
     if [[ "$CONTINUE_ON_ERROR" == true ]]; then
         read -p "Pressione qualquer tecla para continuar.."
