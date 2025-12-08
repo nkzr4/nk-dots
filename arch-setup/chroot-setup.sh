@@ -90,6 +90,7 @@ service_boot() {
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
     log_success "Script preparado com sucesso.."
     log_info "Preparando inicialização do Hyprland..."
+    run sed -i -E "s/\bUSERNAME\b/$USERNAME/g" /hyprland.conf.default
     run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
 cat >> /home/$USERNAME/.bash_profile << 'EOF'
 if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
