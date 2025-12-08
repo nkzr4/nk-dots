@@ -90,31 +90,13 @@ service_boot() {
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
     run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_success "Script preparado com sucesso.."
-    log_info "Criando serviço do Hyprland usando UWSM..."
-    run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
-    run chown $USERNAME:wheel /home/$USERNAME/.config/hypr
-    run mkdir -p /home/$USERNAME/.config/systemd/user
-cat <<EOF > /home/$USERNAME/.config/systemd/user/hyprland.service
-[Unit]
-Description=Start Hyprland via UWSM
-After=graphical-session-pre.target
-Wants=graphical-session-pre.target
-
-[Service]
-Type=exec
-ExecStart=/usr/bin/uwsm start hyprland
-Restart=on-failure
-Environment=XDG_SESSION_TYPE=wayland
-Environment=XDG_CURRENT_DESKTOP=Hyprland
-Environment=WLR_NO_HARDWARE_CURSORS=1
-
-[Install]
-WantedBy=graphical-session.target
+    log_info "Preparando inicialização do Hyprland..."
+cat >> /mnt/home/$USERNAME/.bash_profile << 'EOF'
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+    exec Hyprland
+fi
 EOF
-    run chown -R $USERNAME:wheel /home/$USERNAME/.config/systemd
-    run mkdir -p /home/$USERNAME/.config/systemd/user/graphical-session.target.wants
-    run ln -sf ../hyprland.service /home/$USERNAME/.config/systemd/user/graphical-session.target.wants/hyprland.service
-    log_success "Serviço do Hyprland habilitado com sucesso."
+    chown $USERNAME:wheel /home/$USERNAME/.bash_profile
     log_success "Configuração do hyprland criada com sucesso.."
     log_info "Saindo de ambiente chroot.."
 }
