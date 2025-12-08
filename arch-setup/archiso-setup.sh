@@ -131,6 +131,7 @@ run rm $SCRIPT_DIR/logs.sh
 run rm $SCRIPT_DIR/validations.sh
 run rm $SCRIPT_DIR/vars.sh
 run rm /mnt/chroot-setup.sh
+run rm /mnt/first-init.sh
 run rm /mnt/vars.sh
 run rm /mnt/logs.sh
 run rm /mnt/links.sh

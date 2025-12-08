@@ -3,6 +3,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $SCRIPT_DIR/logs.sh
+source $SCRIPT_DIR/vars.sh
 
 validate_internet() {
     log_info "Verificando conexão com a internet..."
@@ -85,6 +86,54 @@ else
     read -p "Pressione qualquer tecla para encerrar.."
     exit
 fi
+
+# Hyprland.conf
+KEYMAPDIR=".config/hypr/hyprland/keymap.xkb"
+INPUTCONF="$HOME/.config/hypr/hyprland/input.conf"
+sed -i -E \
+    "s/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = br\
+kb_file = \/home\/$USERNAME\/$KEYMAPDIR/" "$INPUTCONF"
+xkbcli dump-keymap-wayland > "$HOME/$KEYMAPDIR"
+sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$HOME/$KEYMAPDIR"
+sed -i -E 's/zen-browser/firefox/' "$HOME/.config/hypr/variables.conf"
+hyprctl reload
+
+# Fastfetch
+cp -r "$HOME/.config/nk-dots/hypr-setup/fish/ascii_frames" "$HOME/.config/fish"
+cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
+cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/display_animation.fish" "$HOME/.config/fish/functions/display_animation.fish"
+cp "$HOME/.config/nk-dots/hypr-setup/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+
+# Wallpapers & GIFs
+mkdir -p "$HOME/Wallpapers"
+mv "$HOME/.config/nk-dots/hypr-setup/wallpapers/"* "$HOME/Wallpapers/"
+sudo mv "$HOME/.config/nk-dots/hypr-setup/assets/"* /etc/xdg/quickshell/caelestia/assets/
+cp "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.jsonc" "$HOME/.config/caelestia/shell.jsonc"
+caelestia scheme set -n dynamic
+caelestia shell wallpaper set "/home/$USERNAME/Wallpapers/white-mountains.jpg"
+
+# Apps
+paru -S --noconfirm github-desktop-bin
+paru -S --noconfirm vscodium-bin
+
+# Snapshot
+sudo pacman -S --noconfirm timeshift
+sudo /etc/grub.d/41_snapshots-btrfs
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+sudo systemctl enable grub-btrfsd
+sudo systemctl start grub-btrfsd
+sudo mkdir -p /etc/systemd/system/grub-btrfsd.service.d
+
+sudo tee /etc/systemd/system/grub-btrfsd.service.d/override.conf >/dev/null <<'EOF'
+[Service]
+ExecStart=
+ExecStart=/usr/bin/grub-btrfsd --syslog -t
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl.restart grub-btrfsd.service
+sudo timeshift --create --tags O --comments "[NK-DOTS] - Instalação concluída"
+
 log_success "Instalação finalizada.."
 echo ""
 read -p "Pressione qualquer tecla para encerrar.."
