@@ -57,7 +57,7 @@ service_installer() {
     fi
     log_success "Vendor definido como '$CPU_VENDOR'.."
     log_info "Iniciando instalação.."
-    run pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland dunst kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
+    run pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
     log_success "Aplicações e dependências instaladas sucesso.."
     log_info "Ativando serviços.."
     run systemctl enable NetworkManager
@@ -83,11 +83,12 @@ service_boot() {
     run grub-mkconfig -o /boot/grub/grub.cfg
     log_success "GRUB configurado com sucesso.."
     log_info "Configurando script de primeira inicialização.."
-    run mkdir -p /home/$USERNAME/.config/{nk-dots,hypr}
-    run mv /first-init.sh /home/$USERNAME/.config/nk-dots/first-init.sh
-    run chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
-    run cp /logs.sh /home/$USERNAME/.config/nk-dots/logs.sh
-    run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
+    run mkdir -p /home/$USERNAME/.config/hypr
+    run git clone https://github.com/nkzr4/nk-dots.git /home/$USERNAME/.config
+    run cp /vars.sh /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
+    run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/first-init.sh
+    run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/logs.sh
+    run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
     log_success "Script preparado com sucesso.."
     log_info "Preparando inicialização do Hyprland..."
     run sed -i -E "s/\bUSERNAME\b/$USERNAME/g" /hyprland.conf.default
