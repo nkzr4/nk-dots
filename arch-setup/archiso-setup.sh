@@ -8,7 +8,7 @@ CONTINUE_ON_ERROR=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-LINKS="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/nkzr4-arch-setup/arch-install/links.sh"
+LINKS="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-setup/links.sh
 curl -LO $LINKS
 chmod +x $SCRIPT_DIR/links.sh
 source $SCRIPT_DIR/links.sh
