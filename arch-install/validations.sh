@@ -321,12 +321,12 @@ validate_overview () {
     echo "  Usuário: $USERNAME"
     echo ""
     read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Confirma as configurações e deseja prosseguir? (s/N): " final_confirm
-    echo ""
-    if [[ "$final_confirm" != "s" ]] && [[ "$final_confirm" != "S" ]]; then
-        log_warning "Instalação cancelada pelo usuário.."
-        echo ""
-        read -p "Pressione qualquer tecla para encerrar.."
-        exit 1
+    if [[ -n "$final_confirm" && "$final_confirm" != "s" && "$final_confirm" != "S" ]]; then
+            log_warning "Instalação cancelada pelo usuário.."
+            echo ""
+            read -p "Pressione qualquer tecla para encerrar.."
+            exit 1
+        fi
     fi
     log_info "Exportando variáveis.."
 cat <<EOF > $SCRIPT_DIR/vars.sh
