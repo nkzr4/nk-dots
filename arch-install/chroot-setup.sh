@@ -91,7 +91,7 @@ service_boot() {
     run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_success "Script preparado com sucesso.."
     log_info "Preparando inicialização do Hyprland..."
-cat >> /mnt/home/$USERNAME/.bash_profile << 'EOF'
+cat >> /home/$USERNAME/.bash_profile << 'EOF'
 if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     exec Hyprland
 fi
