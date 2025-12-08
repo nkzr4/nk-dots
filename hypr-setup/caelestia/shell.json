@@ -340,7 +340,7 @@
     "paths": {
         "mediaGif": "root:/assets/soundwaves.gif",
         "sessionGif": "root:/assets/void.gif",
-        "wallpaperDir": "~/Pictures/Wallpapers"
+        "wallpaperDir": "/home/USERNAME/Wallpapers"
     },
     "services": {
         "audioIncrement": 0.1,
