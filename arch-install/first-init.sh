@@ -9,40 +9,37 @@ validate_internet() {
     run nmcli radio wifi on
     if run ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
         log_success "Conexão com a internet já está ativa"
-        WIFINAME=""
-        WIFIPASSWD=""
-        return 0
+        echo ""
+        read -p "Pressione qualquer tecla para continuar.."
     fi
     log_warning "Sem conexão com a internet. Configurando WiFi com nmcli..."
-    local device=$(run nmcli -t -f DEVICE,TYPE device status | awk -F: '$2=="wifi"{print $1; exit}')
-    if [[ -z "$device" ]]; then
+    local WLAN=$(nmcli -t -f DEVICE,TYPE device status | awk -F: '$2=="wifi"{print $1; exit}')
+    if [[ -z "$WLAN" ]]; then
         log_error "Nenhum dispositivo WiFi encontrado"
-        exit 1
+        echo ""
+        read -p "Pressione qualquer tecla para encerrar.."
+        exit
     fi
     while true; do
-        echo ""
         log_info "Redes WiFi disponíveis:"
         run nmcli device wifi list
-        echo ""
         read -p "Digite o nome da rede WiFi (SSID): " WIFINAME
+        echo ""
         if [[ -z "$WIFINAME" ]]; then
             log_error "O nome da rede WiFi não pode ser vazio. Tente novamente.."
-            echo ""
             continue
         fi
         read -sp "Digite a senha da rede WiFi: " WIFIPASSWD
         echo ""
         if [[ -z "$WIFIPASSWD" ]]; then
-            log_error "A senha da rede WiFi não pode ser vazia"
+            log_error "A senha da rede WiFi não pode ser vazia. Tente novamente"
             continue
         fi
         log_info "Conectando à rede '$WIFINAME'..."
-        if nmcli run device wifi connect "$WIFINAME" password "$WIFIPASSWD" ifname "$device" &>/dev/null; then
+        if nmcli run device wifi connect "$WIFINAME" password "$WIFIPASSWD" ifname "$WLAN" &>/dev/null; then
             sleep 3
             if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
-                echo ""
-                log_success "Conectado à internet com sucesso via nmcli"
-                echo ""
+                log_success "Conectado à internet com sucesso via nmcli.."
                 break
             else
                 log_error "Conexão estabelecida mas sem acesso à internet. Verifique a rede.."
@@ -72,21 +69,22 @@ run makepkg -sri
 if run command -v paru >/dev/null 2>&1; then
     log_success "Paru instalado com sucesso."
 else
-    log_warning "A instalação do Paru falhou. Tente novamente.."
+    log_error "A instalação do Paru falhou. Tente novamente.."
+    echo ""
+    read -p "Pressione qualquer tecla para encerrar.."
     exit
 fi
-echo ""
-
 log_info "Iniciando instalação do caelestia-dots.."
 run git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia
 run ~/.local/share/caelestia/install.fish
 if run command -v caelestia shell >/dev/null 2>&1; then
     log_success "caelestia-dots instalado com sucesso."
 else
-    log_warning "A instalação do caelestia-dots falhou. Tente novamente.."
+    log_error "A instalação do caelestia-dots falhou. Tente novamente.."
+    echo ""
+    read -p "Pressione qualquer tecla para encerrar.."
     exit
 fi
+log_success "Instalação finalizada.."
 echo ""
-
-log_info "Instalação finalizada.."
 read -p "Pressione qualquer tecla para encerrar.."
