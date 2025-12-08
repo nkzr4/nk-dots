@@ -88,9 +88,9 @@ service_boot() {
     run chmod +x /home/$USERNAME/.config/nk-dots/first-init.sh
     run cp /logs.sh /home/$USERNAME/.config/nk-dots/logs.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/logs.sh
-    run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_success "Script preparado com sucesso.."
     log_info "Preparando inicialização do Hyprland..."
+    run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
 cat >> /home/$USERNAME/.bash_profile << 'EOF'
 if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     exec Hyprland
@@ -98,6 +98,7 @@ fi
 EOF
     chown $USERNAME:wheel /home/$USERNAME/.bash_profile
     log_success "Configuração do hyprland criada com sucesso.."
+    run chown -R $USERNAME:wheel /home/$USERNAME/.config
     log_info "Saindo de ambiente chroot.."
 }
 
