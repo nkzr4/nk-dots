@@ -172,10 +172,10 @@ validate_diskname() {
 validate_language() {
     while true; do
         log_info "Defina o idioma do sistema..."
-        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US): " LANGUAGE
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o locale (default: en_US.UTF-8): " LANGUAGE
         check_exit "$LANGUAGE"
         if [[ -z "$LANGUAGE" ]]; then
-            LANGUAGE="en_US"
+            LANGUAGE="en_US.UTF-8"
             log_success "Idioma padrão '$LANGUAGE' definido com sucesso.."
             break
         fi
