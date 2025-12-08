@@ -1,11 +1,6 @@
 #!/bin/bash
 # archiso-setup.sh - Instalação automatizada do Arch Linux via Arch ISO
 
-# Todo
-# Criar log de input
-# Remover espaços desnecessários
-# Definir uma senha para tudo
-
 CONTINUE_ON_ERROR=false
 [[ "$1" == "--continue-on-error" ]] && CONTINUE_ON_ERROR=true
 
