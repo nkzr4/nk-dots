@@ -84,15 +84,19 @@ service_boot() {
     log_success "GRUB configurado com sucesso.."
     log_info "Configurando script de primeira inicialização.."
     run mkdir -p /home/$USERNAME/.config/hypr
-    run git clone https://github.com/nkzr4/nk-dots.git /home/$USERNAME/.config
+    run git clone https://github.com/nkzr4/nk-dots.git /home/$USERNAME/.config/nk-dots
+    DATE2=$(date +"%Y-%m-%d %H:%M:%S")
+cat >> /vars.sh <<EOF
+DATE2="$DATE2"
+EOF
     run cp /vars.sh /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/first-init.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/logs.sh
     run chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
     log_success "Script preparado com sucesso.."
     log_info "Preparando inicialização do Hyprland..."
-    run sed -i -E "s/\bUSERNAME\b/$USERNAME/g" /hyprland.conf.default
-    run mv /hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
+    run sed -i -E "s/\bUSERNAME\b/$USERNAME/g" /home/$USERNAME/.config/nk-dots/arch-setup/hyprland.conf.default
+    run cp /home/$USERNAME/.config/nk-dots/arch-setup/hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
 cat >> /home/$USERNAME/.bash_profile << 'EOF'
 if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
     exec Hyprland
