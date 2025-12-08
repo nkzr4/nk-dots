@@ -327,6 +327,9 @@ validate_overview () {
         read -p "Pressione qualquer tecla para encerrar.."
         exit 1
     fi
+    run timedatectl set-ntp true
+    run timedatectl set-timezone $TIMEZONE
+    DATE1=$(date +"%Y-%m-%d %H:%M:%S")
     log_info "Exportando variáveis.."
 cat <<EOF > $SCRIPT_DIR/vars.sh
 KBLAYOUT="$KBLAYOUT"
@@ -343,6 +346,7 @@ ROOTPASSWD="$ROOTPASSWD"
 USERNAME="$USERNAME"
 USERPASSWD="$USERPASSWD"
 LUKSPASSWD="$LUKSPASSWD"
+DATE1="$DATE1"
 EOF
     chmod +x $SCRIPT_DIR/vars.sh
     log_success "Variáveis exportadas para 'vars.sh' com sucesso.."
