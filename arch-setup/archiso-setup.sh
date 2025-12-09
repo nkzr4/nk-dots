@@ -6,7 +6,7 @@ MOUNTPOINT="/mnt"
 
 download_links() {
     echo -e "\e[1m[\e[34m  INFO  \e[39m]\e[0m $(date '+%H:%M:%S') - Carregando links"
-    # curl -LO "https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-setup/links.sh"
+    curl -LO "https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch-setup/links.sh"
     if [[ ! -f "$DIR/links.sh" ]] || grep -qx "404: Not Found" "$DIR/links.sh"; then
         echo -e "\e[1m[\e[31m  ERRO  \e[39m]\e[0m $(date '+%H:%M:%S') - Arquivo 'links.sh' inválido ou inexistente"
         echo ""

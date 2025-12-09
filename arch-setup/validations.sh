@@ -71,7 +71,6 @@ validate_pcname() {
     while true; do
         log_info "Definindo hostname"
         read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do computador (default: nkarch) " PCNAME
-        check_exit "$PCNAME"
         if [[ -z "$PCNAME" ]]; then
             PCNAME="nkarch"
             log_success "Hostname '$PCNAME' definido"
@@ -91,7 +90,6 @@ validate_username() {
     while true; do
         log_info "Definindo nome de usuário"
         read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome do usuário (default: nkzr4): " USERNAME
-        check_exit "$USERNAME"
         if [[ -z "$USERNAME" ]]; then
             USERNAME="nkzr4"
             log_success "Nome de usuário '$USERNAME' definido"
