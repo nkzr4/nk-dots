@@ -63,9 +63,9 @@ validate_internet() {
             read -p "Pressione qualquer tecla para encerrar.."
             exit 1
         fi
-        run iwctl station "$device" scan
+        iwctl station "$device" scan
         sleep 2
-        run iwctl station "$device" get-networks
+        iwctl station "$device" get-networks
         read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Digite o nome da rede WiFi (SSID): " WIFINAME
         check_exit "$WIFINAME"
         if [[ -z "$WIFINAME" ]]; then
@@ -327,8 +327,8 @@ validate_overview () {
         read -p "Pressione qualquer tecla para encerrar.."
         exit 1
     fi
-    run timedatectl set-ntp true
-    run timedatectl set-timezone $TIMEZONE
+    timedatectl set-ntp true
+    timedatectl set-timezone $TIMEZONE
     DATE1=$(date +"%Y-%m-%d %H:%M:%S")
     log_info "Exportando variáveis.."
 cat <<EOF > $SCRIPT_DIR/vars.sh
