@@ -7,11 +7,9 @@ source $SCRIPT_DIR/vars.sh
 
 validate_internet() {
     log_info "Verificando conexão com a internet..."
-    run nmcli radio wifi on
-    if run ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
-        log_success "Conexão com a internet já está ativa"
-        echo ""
-        read -p "Pressione qualquer tecla para continuar.."
+    nmcli radio wifi on
+    if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
+        log_success "Conexão com a internet já está ativa.."
     fi
     log_warning "Sem conexão com a internet. Configurando WiFi com nmcli..."
     local WLAN=$(nmcli -t -f DEVICE,TYPE device status | awk -F: '$2=="wifi"{print $1; exit}')
@@ -23,7 +21,7 @@ validate_internet() {
     fi
     while true; do
         log_info "Redes WiFi disponíveis:"
-        run nmcli device wifi list
+        nmcli device wifi list
         read -p "Digite o nome da rede WiFi (SSID): " WIFINAME
         echo ""
         if [[ -z "$WIFINAME" ]]; then
@@ -37,10 +35,10 @@ validate_internet() {
             continue
         fi
         log_info "Conectando à rede '$WIFINAME'..."
-        if nmcli run device wifi connect "$WIFINAME" password "$WIFIPASSWD" ifname "$WLAN" &>/dev/null; then
+        if nmcli device wifi connect "$WIFINAME" password "$WIFIPASSWD" ifname "$WLAN" &>/dev/null; then
             sleep 3
             if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
-                log_success "Conectado à internet com sucesso via nmcli.."
+                log_success "Conectado à internet com sucesso.."
                 break
             else
                 log_error "Conexão estabelecida mas sem acesso à internet. Verifique a rede.."
@@ -57,17 +55,45 @@ validate_internet() {
     done
 }
 
+calc_diff() {
+    local t1=$1
+    local t2=$2
+    local diff=$((t2 - t1))
+    echo "$((diff / 3600)) $(((diff % 3600) / 60)) $((diff % 60))"
+}
+
+to_timestamp() {
+    date -d "$1" +%s 2>/dev/null
+}
+
+setup_duration() {
+    TS1=$(to_timestamp "$DATE1")
+    TS2=$(to_timestamp "$DATE2")
+    TS3=$(to_timestamp "$DATE3")
+    read HORAS1 MINUTOS1 SEGUNDOS1 <<< "$(calc_diff "$TS1" "$TS2")"
+    read HORAS2 MINUTOS2 SEGUNDOS2 <<< "$(calc_diff "$TS2" "$TS3")"
+    read HORAS3 MINUTOS3 SEGUNDOS3 <<< "$(calc_diff "$TS1" "$TS3")"
+    echo "────────────────────────────────────────────────────────────────────────"
+    echo "Tempo total de instalação:"
+    printf "%02dh %02dm %02ds\n" "$HORAS3" "$MINUTOS3" "$SEGUNDOS3"
+    echo "Tempo de instalação do Arch Linux:"
+    printf "%02dh %02dm %02ds\n" "$HORAS1" "$MINUTOS1" "$SEGUNDOS1"
+    echo "Tempo de instalação do caelestia-shell:"
+    printf "%02dh %02dm %02ds\n" "$HORAS2" "$MINUTOS2" "$SEGUNDOS2"
+    echo "────────────────────────────────────────────────────────────────────────"
+}
+
 show_header "CONFIGURAÇÃO DE PRIMEIRA INICIALIZAÇÃO"
 log_info "Conectando-se a internet.."
-run validate_internet
+validate_internet
 
 log_info "Iniciando instalação do Paru AUR helper.."
-run mkdir -p ~/temp-repos/paru
-run git clone https://aur.archlinux.org/paru.git ~/temp-repos/paru
-run cd ~/temp-repos/paru
-run log_info "Instalando Paru.."
-run makepkg -sri
-if run command -v paru >/dev/null 2>&1; then
+mkdir -p ~/.config/nk-dots/repos/paru
+git clone https://aur.archlinux.org/paru.git ~/.config/nk-dots/repos/paru
+cd ~/.config/nk-dots/repos/paru
+log_info "Instalando Paru.."
+makepkg -sri
+if command -v paru >/dev/null 2>&1; then
     log_success "Paru instalado com sucesso."
 else
     log_error "A instalação do Paru falhou. Tente novamente.."
@@ -75,10 +101,12 @@ else
     read -p "Pressione qualquer tecla para encerrar.."
     exit
 fi
+log_success "Paru instalado com sucesso.."
+
 log_info "Iniciando instalação do caelestia-dots.."
-run git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia
-run ~/.local/share/caelestia/install.fish
-if run command -v caelestia shell >/dev/null 2>&1; then
+git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia
+~/.local/share/caelestia/install.fish
+if command -v caelestia shell >/dev/null 2>&1; then
     log_success "caelestia-dots instalado com sucesso."
 else
     log_error "A instalação do caelestia-dots falhou. Tente novamente.."
@@ -86,54 +114,94 @@ else
     read -p "Pressione qualquer tecla para encerrar.."
     exit
 fi
+log_success "caelestia-dots instalado com sucesso.."
 
-# Hyprland.conf
+log_info "Definindo layout do teclado.."
 KEYMAPDIR=".config/hypr/hyprland/keymap.xkb"
 INPUTCONF="$HOME/.config/hypr/hyprland/input.conf"
-sed -i -E \
-    "s/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = br\
-kb_file = \/home\/$USERNAME\/$KEYMAPDIR/" "$INPUTCONF"
+if [[ "$KBLAYOUT" == "br-abnt2" ]]; then
+    sed -i -E \
+        's/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = br\
+    kb_file = \/home\/$USERNAME\/$KEYMAPDIR/' "$INPUTCONF"
+    log_success "Layout definido com br-abnt2.."
+else
+    sed -i -E \
+        's/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = us\
+    kb_file = \/home\/$USERNAME\/$KEYMAPDIR/' "$INPUTCONF"
+    log_success "Layout definido com us.."
+fi
+log_info "Exportando keymap.xkb.."
 xkbcli dump-keymap-wayland > "$HOME/$KEYMAPDIR"
+log_info "Corrigindo capslock.."
 sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$HOME/$KEYMAPDIR"
-sed -i -E 's/zen-browser/firefox/' "$HOME/.config/hypr/variables.conf"
+log_success "Keymap exportada.."
 hyprctl reload
 
-# Fastfetch
+log_info "Definindo navegador padrão.."
+sed -i -E 's/zen-browser/firefox/' "$HOME/.config/hypr/variables.conf"
+log_success "Navegador padrão definido como firefox.."
+
+log_info "Animando fastfetch.."
 cp -r "$HOME/.config/nk-dots/hypr-setup/fish/ascii_frames" "$HOME/.config/fish"
 cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
 cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/display_animation.fish" "$HOME/.config/fish/functions/display_animation.fish"
 cp "$HOME/.config/nk-dots/hypr-setup/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+log_success "Animação ASCII instalada.."
 
-# Wallpapers & GIFs
+log_info "Movendo wallpapers.."
 mkdir -p "$HOME/Wallpapers"
 mv "$HOME/.config/nk-dots/hypr-setup/wallpapers/"* "$HOME/Wallpapers/"
+log_info "Movendo GIFs.."
 sudo mv "$HOME/.config/nk-dots/hypr-setup/assets/"* /etc/xdg/quickshell/caelestia/assets/
-cp "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.jsonc" "$HOME/.config/caelestia/shell.jsonc"
+log_info "Criando shell.json.."
+sed -i -E "s/\bUSERNAME\b/$USERNAME/g" "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.json"
+cp "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
+log_info "Definindo plano de fundo.."
+caelestia wallpaper -f "/home/$USERNAME/Wallpapers/mountains-dark.jpg"
 caelestia scheme set -n dynamic
-caelestia shell wallpaper set "/home/$USERNAME/Wallpapers/white-mountains.jpg"
+log_success "Configurações do tema definidas com sucesso.."
 
-# Apps
+log_info "Instalando github desktop.."
 paru -S --noconfirm github-desktop-bin
+log_info "Instalando VSCodium.."
 paru -S --noconfirm vscodium-bin
+log_success "GitHub Desktop e VSCodium instalados com sucesso.."
 
-# Snapshot
+log_info "Configurando timeshift.."
 sudo pacman -S --noconfirm timeshift
+log_info "Iniciando GRUB-Btrfs.."
 sudo /etc/grub.d/41_snapshots-btrfs
+log_info "Configurando GRUB.."
 sudo grub-mkconfig -o /boot/grub/grub.cfg
+log_info "Configurando GRUB-Btrfs.."
 sudo systemctl enable grub-btrfsd
 sudo systemctl start grub-btrfsd
 sudo mkdir -p /etc/systemd/system/grub-btrfsd.service.d
-
 sudo tee /etc/systemd/system/grub-btrfsd.service.d/override.conf >/dev/null <<'EOF'
 [Service]
 ExecStart=
 ExecStart=/usr/bin/grub-btrfsd --syslog -t
 EOF
-
+log_info "Finalizando configuração.."
 sudo systemctl daemon-reload
-sudo systemctl.restart grub-btrfsd.service
+sudo systemctl start grub-btrfsd.service
+log_info "Criando snapshot de conclusão.."
 sudo timeshift --create --tags O --comments "[NK-DOTS] - Instalação concluída"
+log_success "Timeshift e GRUB-Btrfs configurados com sucesso.."
 
-log_success "Instalação finalizada.."
+log_info "Removendo diretórios temporários.."
+rm -rf ~/.config/nk-dots/repos
+log_info "Concluindo instalação.."
+DATE3=$(date +"%Y-%m-%d %H:%M:%S")
+cat >> /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh <<EOF
+DATE3="$DATE3"
+EOF
+sleep 3
+
+show_header "INSTALAÇÃO FINALIZADA"
+setup_duration
+
+echo ""
+log_success "A instalação foi concluída com sucesso.."
 echo ""
 read -p "Pressione qualquer tecla para encerrar.."
