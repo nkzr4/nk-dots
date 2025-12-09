@@ -66,9 +66,6 @@ service_installer() {
     systemctl enable firewalld
     systemctl enable fstrim.timer
     systemctl enable acpid
-    systemctl enable gcr-ssh-agent.socket
-    systemctl enable gnome-keyring-daemon.service
-    systemctl enable gnome-keyring-daemon.socket
     log_success "Serviços ativados com sucesso.."
 }
 
@@ -113,12 +110,12 @@ EOF
 
 cd
 show_header "ETAPA 4 - CONFIGURAÇÕES DO USUÁRIO"
-run service_user
+service_user
 
 show_header "ETAPA 5 - INSTALANDO APLICAÇÕES"
-run service_installer
+service_installer
 
 show_header "ETAPA 6 - PREPARANDO INICIALIZAÇÃO"
-run service_boot
+service_boot
 
 exit

@@ -1,5 +1,7 @@
 #!/bin/bash
 # first-init.sh - Script de primeira inicialização
+# ToDo
+# exec-once = /usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $SCRIPT_DIR/logs.sh
@@ -85,6 +87,11 @@ setup_duration() {
 show_header "CONFIGURAÇÃO DE PRIMEIRA INICIALIZAÇÃO"
 log_info "Conectando-se a internet.."
 validate_internet
+
+log_info "Ativando serviços como user.."
+systemctl --user enable --now gcr-ssh-agent.socket
+systemctl --user enable --now gnome-keyring-daemon.service
+systemctl --user enable --now gnome-keyring-daemon.socket
 
 log_info "Iniciando instalação do Paru AUR helper.."
 mkdir -p ~/.config/nk-dots/repos/paru

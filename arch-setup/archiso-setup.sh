@@ -122,21 +122,22 @@ clean_root_dir() {
 
 set -euo pipefail
 
+download_scripts
+
 show_header "INICIANDO INSTALAÇÃO DO ARCH LINUX"
-run download_scripts
-run validate_internet
-run validate_scripts
+validate_internet
+validate_scripts
 
 cd
 show_header "nk-dots - ARCH LINUX BTRFS"
-run service_start
+service_start
 
 show_header "ETAPA 2 - PREPARANDO DISCO BTRFS"
-run service_disk
+service_disk
 
 show_header "ETAPA 3 - ENTRANDO EM CHROOT"
-run prepare_chroot
+prepare_chroot
 
 show_header "INSTALAÇÃO DO ARCH LINUX FINALZIADA"
-run clean_root_dir
-run reboot
+clean_root_dir
+reboot

@@ -1,44 +1,43 @@
 #!/bin/bash
-# logs.sh — Sistema de logs padronizado para scripts Bash
+# logs.sh 
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_DIR="$SCRIPT_DIR/logs"
 mkdir -p "$LOG_DIR"
 
-if [[ -z "${LOG_FILE:-}" ]]; then
+if [[ -z "$LOG_FILE" ]]; then
     LOG_FILE="$LOG_DIR/$(date '+%Y-%m-%d')-$(date '+%H%M%S').log"
 fi
 
-LOG_DELAY="${LOG_DELAY:-0}"
-
-RESET="\e[0m"
-BOLD="\e[1m"
-BLUE="\e[34m"
-GREEN="\e[32m"
-YELLOW="\e[33m"
-RED="\e[31m"
+trap 'pause_on_error $? "$BASH_COMMAND" "$LINENO"' ERR
 
 _write_log_file() {
-    local timestamp
-    timestamp="$(date '+%Y-%m-%d %H:%M:%S')"
-    echo "[$timestamp] $1" >> "$LOG_FILE"
+    echo "[$(date '+%H:%M:%S')] $1" >> "$LOG_FILE"
 }
 
-_print_log() {
-    local label="$1"
-    local color="$2"
-    local message="$3"
-    local now
-    now="$(date '+%H:%M:%S')"
-    echo -e "[$color$label$RESET] $now - $message"
-    _write_log_file "$label - $message"
-    (( LOG_DELAY > 0 )) && sleep "$LOG_DELAY"
+log_info() {
+    echo -e "\e[0m[\e[1;34m  INFO  \e[0m] $(date '+%H:%M:%S') - $1"
+    _write_log_file "INFO    - $1"
+    sleep 0.4
 }
 
-log_info()    { _print_log "INFO   " "$BLUE"   "$1"; }
-log_success() { _print_log "SUCESS " "$GREEN"  "$1"; }
-log_warning() { _print_log "ALERTA " "$YELLOW" "$1"; }
-log_error()   { _print_log "ERRO   " "$RED"    "$1"; }
+log_success() {
+    echo -e "\e[0m[\e[1;32m SUCESS \e[0m] $(date '+%H:%M:%S') - $1"
+    _write_log_file "SUCCESS - $1"
+    sleep 0.4
+}
+
+log_warning() {
+    echo -e "\e[0m[\e[1;33m ALERTA \e[0m] $(date '+%H:%M:%S') - $1"
+    _write_log_file "WARNING - $1"
+    sleep 0.4
+}
+
+log_error() {
+    echo -e "\e[0m[\e[1;31m  ERRO  \e[0m] $(date '+%H:%M:%S') - $1"
+    _write_log_file "ERROR   - $1"
+    sleep 0.4
+}
 
 show_header() {
     local title="$1"
@@ -56,21 +55,17 @@ show_header() {
     echo ""
 }
 
-_pause_on_error_internal() {
+pause_on_error() {
     local exit_code="$1"
     local cmd="$2"
     local line="$3"
-    local stderr_output="$4"
 
     echo "────────────────────────────────────────────────────────────────────────"
     log_error "Ocorreu um erro na execução do script:"
-    log_info  "Comando: $cmd"
-    log_info  "Código:  $exit_code"
-    log_info  "Linha:   $line"
-    if [[ -n "$stderr_output" ]]; then
-        log_error "Mensagem de erro retornada (stderr):"
-        echo -e "$stderr_output"
-    fi
+    log_info "Comando: $cmd"
+    log_info "Código:  $exit_code"
+    log_info "Linha:   $line"
+
     {
         echo "────────────────────────────────────────────────────────────────────────"
         echo "Data: $(date '+%Y-%m-%d %H:%M:%S')"
@@ -79,30 +74,41 @@ _pause_on_error_internal() {
         echo "Comando com falha: $cmd"
         echo "Código de saída:   $exit_code"
         echo "Linha do erro:     $line"
-        [[ -n "$stderr_output" ]] && {
-            echo "Stderr capturado:"
-            echo "$stderr_output"
-        }
         echo "────────────────────────────────────────────────────────────────────────"
     } >> "$LOG_FILE"
+
     log_warning "O erro foi registrado em: $LOG_FILE"
-    read -p "Pressione qualquer tecla para encerrar..."
-    echo ""
-    exit 1
+
+    if [[ "$CONTINUE_ON_ERROR" == true ]]; then
+        read -p "Pressione qualquer tecla para continuar.."
+        echo ""
+        return 0
+    else
+        log_info "Encerrando execução."
+        exit 1
+    fi
 }
 
-trap '{
-    ec="$?";
-    cmd="$BASH_COMMAND";
-    line="$LINENO";
+run() {
+    local cmd=("$@")
+    local cmd_str="$*"
+    local line="${BASH_LINENO[0]}"
 
-    stderr_tmp="$(mktemp)"
-    exec 3>&2 2>"$stderr_tmp"
-    true
-    exec 2>&3 3>&-
+    "${cmd[@]}"
+    local exit_code=$?
 
-    stderr_output="$(cat "$stderr_tmp")"
-    rm -f "$stderr_tmp"
+    if [[ $exit_code -ne 0 ]]; then
+        pause_on_error "$exit_code" "$cmd_str" "$line"
+    fi
+}
 
-    _pause_on_error_internal "$ec" "$cmd" "$line" "$stderr_output"
-}' ERR
+check_exit() {
+    if [[ "$1" == "sair" ]] || [[ "$1" == "SAIR" ]]; then
+        echo ""
+        log_warning "Instalação cancelada pelo usuário.."
+        echo ""
+        read -p "Pressione qualquer tecla para encerrar.."
+        echo ""
+        exit 0
+    fi
+}

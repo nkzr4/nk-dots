@@ -36,12 +36,6 @@ validate_scripts() {
         read -p "Pressione qualquer tecla para continuar.."
         exit 1
     fi
-    if [[ ! -f "$SCRIPT_DIR/hyprland.conf.default" ]]; then
-        log_error "Arquivo 'hyprland.conf.default' não encontrado. Verifique sua conexão com a internet.."
-        echo ""
-        read -p "Pressione qualquer tecla para continuar.."
-        exit 1
-    fi
     log_success "Scripts carregados com sucesso..."
 }
 
