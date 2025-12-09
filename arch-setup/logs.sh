@@ -89,6 +89,22 @@ error_handler() {
     exit $exit_code
 }
 
+show_header() {
+    local title="$1"
+    local width=72
+    local inner_width=$((width - 2))
+    local title_len=${#title}
+    local total_spaces=$((inner_width - title_len))
+    local left_spaces=$(( total_spaces / 2 ))
+    local right_spaces=$(( total_spaces - left_spaces ))
+
+    clear
+    echo "╭──────────────────────────────────────────────────────────────────────╮"
+    printf "│%*s%s%*s│\n" "$left_spaces" "" "$title" "$right_spaces" ""
+    echo "╰──────────────────────────────────────────────────────────────────────╯"
+    echo ""
+}
+
 set -eE
 trap error_handler ERR
 
