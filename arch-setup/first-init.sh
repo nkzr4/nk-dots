@@ -23,7 +23,6 @@ validate_internet() {
         log_info "Redes WiFi disponíveis:"
         nmcli device wifi list
         read -p "Digite o nome da rede WiFi (SSID): " WIFINAME
-        echo ""
         if [[ -z "$WIFINAME" ]]; then
             log_error "O nome da rede WiFi não pode ser vazio. Tente novamente.."
             continue
