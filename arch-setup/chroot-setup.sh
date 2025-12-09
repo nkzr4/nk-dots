@@ -89,7 +89,7 @@ setup_boot() {
     mkdir -p /home/$USERNAME/.config/hypr
     git clone https://github.com/nkzr4/nk-dots.git /home/$USERNAME/.config/nk-dots
     DATE2=$(date +"%Y-%m-%d %H:%M:%S")
-cat >> /vars.sh <<EOF
+cat >> $DIR/vars.sh <<EOF
 DATE2="$DATE2"
 EOF
     cp /vars.sh /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh

@@ -213,6 +213,55 @@ validate_diskname() {
     done
 }
 
+validate_internet() {
+    while true; do
+        log_info "Verificando conexão com a internet"
+        nmcli radio wifi on
+        if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
+            log_success "Conexão com a internet ativa"
+            break
+        fi
+        log_warning "Sem conexão com a internet"
+        local WLAN=$(nmcli -t -f DEVICE,TYPE device status | awk -F: '$2=="wifi"{print $1; exit}')
+        if [[ -z "$WLAN" ]]; then
+            log_error "Nenhum dispositivo WiFi encontrado"
+            echo ""
+            read -n 1 -s -p "Pressione qualquer tecla para encerrar a instalação..."
+            exit 1
+        fi
+        while true; do
+            log_info "Redes WiFi disponíveis:"
+            nmcli device wifi list
+            read -p "Digite o nome da rede WiFi (SSID): " WIFINAME
+            if [[ -z "$WIFINAME" ]]; then
+                log_error "Nome não pode ser vazio"
+                continue
+            fi
+            read -sp "Digite a senha da rede WiFi: " WIFIPASSWD
+            echo ""
+            if [[ -z "$WIFIPASSWD" ]]; then
+                log_error "A senha da rede WiFi não pode ser vazia. Tente novamente"
+                continue
+            fi
+            log_info "Conectando à rede '$WIFINAME'"
+            if nmcli device wifi connect "$WIFINAME" password "$WIFIPASSWD" ifname "$WLAN" &>/dev/null; then
+                sleep 3
+                if ping -c 1 -W 2 8.8.8.8 &>/dev/null; then
+                    log_success "Conectado à internet"
+                    break
+                else
+                    log_error "Conexão sem acesso à internet"
+                    continue
+                fi
+            else
+                log_error "Falha ao conectar"
+                continue
+            fi
+        done
+        break
+    done
+}
+
 validate_overview () {
     log_info "Resumo das configurações:"
     echo ""
