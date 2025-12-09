@@ -109,7 +109,21 @@ EOF
     chown $USERNAME:wheel /home/$USERNAME/.bash_profile
     log_success "Inicialização do hyprland configurada"
     chown -R $USERNAME:wheel /home/$USERNAME/.config
-    log_info "Saindo de ambiente chroot"
+}
+
+setup_autologin() {
+    local USERNAME="$1"
+    log_info "Configurando autologin de '$USERNAME' no tty1"
+    mkdir -p /etc/systemd/system/getty@tty1.service.d
+cat <<EOF > /etc/systemd/system/getty@tty1.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/agetty --autologin ${USERNAME} --noclear %I \$TERM
+Type=idle
+EOF
+    systemctl daemon-reload
+    systemctl enable getty@tty1.service
+    log_sucess "Autologin configurado"
 }
 
 cd
@@ -121,3 +135,5 @@ run setup_apps
 
 show_header "PREPARANDO INICIALIZAÇÃO"
 run setup_boot
+run setup_autologin "$USERNAME"
+log_info "Saindo de ambiente chroot"
