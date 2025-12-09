@@ -166,6 +166,7 @@ setup_chroot() {
 }
 
 erase_scripts() {
+    [ -d "$LOG_DIR" ] && rm -rf "$LOG_DIR"
     rm $DIR/links.sh
     rm $DIR/logs.sh
     rm $DIR/handler.sh
@@ -197,7 +198,7 @@ show_header "INICIANDO CHROOT"
 run setup_chroot
 
 show_header "INSTALAÇÃO FINALZIADA"
-clean_root_dir
+erase_scripts
 echo ""
 read -n 1 -s -p "Pressione qualquer tecla para reiniciar..."
 reboot

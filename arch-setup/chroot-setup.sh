@@ -123,7 +123,7 @@ Type=idle
 EOF
     systemctl daemon-reload
     systemctl enable getty@tty1.service
-    log_sucess "Autologin configurado"
+    log_success "Autologin configurado"
 }
 
 cd

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
-LOG_DIR="$SCRIPT_DIR/logs"
+DIR="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
+LOG_DIR="$DIR/logs"
 LOG_FILE="$LOG_DIR/$(date '+%Y-%m-%d %H:%M:%S').log"
 mkdir -p "$LOG_DIR"
 
