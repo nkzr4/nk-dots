@@ -57,7 +57,7 @@ service_installer() {
     fi
     log_success "Vendor definido como '$CPU_VENDOR'.."
     log_info "Iniciando instalação.."
-    run pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion
+    run pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome firefox vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion gnome-keyring libsecret seahorse
     log_success "Aplicações e dependências instaladas sucesso.."
     log_info "Ativando serviços.."
     run systemctl enable NetworkManager
@@ -66,6 +66,10 @@ service_installer() {
     run systemctl enable firewalld
     run systemctl enable fstrim.timer
     run systemctl enable acpid
+    run systemctl enable gcr-ssh-agent.socket
+    run systemctl enable gnome-keyring-daemon.service
+    run systemctl enable gnome-keyring-daemon.socket
+
     log_success "Serviços ativados com sucesso.."
 }
 
