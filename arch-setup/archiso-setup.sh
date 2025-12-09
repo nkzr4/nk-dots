@@ -20,7 +20,7 @@ download_links() {
 
 download_logs() {
     echo -e "\e[1m[\e[34m  INFO  \e[39m]\e[0m $(date '+%H:%M:%S') - Carregando 'logs.sh'"
-    # curl -LO $LOGSLINK
+    curl -LO $LOGSLINK
     if [[ ! -f "$DIR/logs.sh" ]] || grep -qx "404: Not Found" "$DIR/logs.sh"; then
         echo -e "\e[1m[\e[31m  ERRO  \e[39m]\e[0m $(date '+%H:%M:%S') - Arquivo 'logs.sh' inválido ou inexistente"
         echo ""
@@ -34,7 +34,7 @@ download_logs() {
 
 download_handler() {
     log_info "Carregando 'handler.sh'"
-    # curl -LO $HANDLERLINK
+    curl -LO $HANDLERLINK
     if [[ ! -f "$DIR/handler.sh" ]] || grep -qx "404: Not Found" "$DIR/handler.sh"; then
         log_error "Arquivo 'handler.sh' inválido ou inexistente"
         echo ""
@@ -48,7 +48,7 @@ download_handler() {
 
 download_validations() {
     log_info "Carregando 'validations.sh'"
-    # curl -LO $VALIDATIONSLINK
+    curl -LO $VALIDATIONSLINK
     if [[ ! -f "$DIR/validations.sh" ]] || grep -qx "404: Not Found" "$DIR/validations.sh"; then
         log_error "Arquivo 'validations.sh' inválido ou inexistente"
         echo ""
@@ -62,7 +62,7 @@ download_validations() {
 
 download_chroot_setup() {
     log_info "Carregando 'chroot-setup.sh'"
-    # curl -LO $CHROOTSETUPLINK
+    curl -LO $CHROOTSETUPLINK
     if [[ ! -f "$DIR/chroot-setup.sh" ]] || grep -qx "404: Not Found" "$DIR/chroot-setup.sh"; then
         log_error "Arquivo 'chroot-setup.sh' inválido ou inexistente"
         echo ""
