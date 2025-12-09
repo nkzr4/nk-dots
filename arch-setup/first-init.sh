@@ -55,17 +55,45 @@ validate_internet() {
     done
 }
 
+calc_diff() {
+    local t1=$1
+    local t2=$2
+    local diff=$((t2 - t1))
+    echo "$((diff / 3600)) $(((diff % 3600) / 60)) $((diff % 60))"
+}
+
+to_timestamp() {
+    date -d "$1" +%s 2>/dev/null
+}
+
+setup_duration() {
+    TS1=$(to_timestamp "$DATE1")
+    TS2=$(to_timestamp "$DATE2")
+    TS3=$(to_timestamp "$DATE3")
+    read HORAS1 MINUTOS1 SEGUNDOS1 <<< "$(calc_diff "$TS1" "$TS2")"
+    read HORAS2 MINUTOS2 SEGUNDOS2 <<< "$(calc_diff "$TS2" "$TS3")"
+    read HORAS3 MINUTOS3 SEGUNDOS3 <<< "$(calc_diff "$TS1" "$TS3")"
+    echo "────────────────────────────────────────────────────────────────────────"
+    echo "Tempo total de instalação:"
+    printf "%02dh %02dm %02ds\n" "$HORAS3" "$MINUTOS3" "$SEGUNDOS3"
+    echo "Tempo de instalação do Arch Linux:"
+    printf "%02dh %02dm %02ds\n" "$HORAS1" "$MINUTOS1" "$SEGUNDOS1"
+    echo "Tempo de instalação do caelestia-shell:"
+    printf "%02dh %02dm %02ds\n" "$HORAS2" "$MINUTOS2" "$SEGUNDOS2"
+    echo "────────────────────────────────────────────────────────────────────────"
+}
+
 show_header "CONFIGURAÇÃO DE PRIMEIRA INICIALIZAÇÃO"
 log_info "Conectando-se a internet.."
-run validate_internet
+validate_internet
 
 log_info "Iniciando instalação do Paru AUR helper.."
-run mkdir -p ~/.config/nk-dots/repos/paru
-run git clone https://aur.archlinux.org/paru.git ~/.config/nk-dots/repos/paru
-run cd ~/.config/nk-dots/repos/paru
-run log_info "Instalando Paru.."
-run makepkg -sri
-if run command -v paru >/dev/null 2>&1; then
+mkdir -p ~/.config/nk-dots/repos/paru
+git clone https://aur.archlinux.org/paru.git ~/.config/nk-dots/repos/paru
+cd ~/.config/nk-dots/repos/paru
+log_info "Instalando Paru.."
+makepkg -sri
+if command -v paru >/dev/null 2>&1; then
     log_success "Paru instalado com sucesso."
 else
     log_error "A instalação do Paru falhou. Tente novamente.."
@@ -76,9 +104,9 @@ fi
 log_success "Paru instalado com sucesso.."
 
 log_info "Iniciando instalação do caelestia-dots.."
-run git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia
-run ~/.local/share/caelestia/install.fish
-if run command -v caelestia shell >/dev/null 2>&1; then
+git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia
+~/.local/share/caelestia/install.fish
+if command -v caelestia shell >/dev/null 2>&1; then
     log_success "caelestia-dots instalado com sucesso."
 else
     log_error "A instalação do caelestia-dots falhou. Tente novamente.."
@@ -125,9 +153,9 @@ mkdir -p "$HOME/Wallpapers"
 mv "$HOME/.config/nk-dots/hypr-setup/wallpapers/"* "$HOME/Wallpapers/"
 log_info "Movendo GIFs.."
 sudo mv "$HOME/.config/nk-dots/hypr-setup/assets/"* /etc/xdg/quickshell/caelestia/assets/
-log_info "Criando shell.jsonc.."
-sed -i -E "s/\bUSERNAME\b/$USERNAME/g" "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.jsonc"
-cp "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.jsonc" "$HOME/.config/caelestia/shell.jsonc"
+log_info "Criando shell.json.."
+sed -i -E "s/\bUSERNAME\b/$USERNAME/g" "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.json"
+cp "$HOME/.config/nk-dots/hypr-setup/caelestia/shell.json" "$HOME/.config/caelestia/shell.json"
 log_info "Definindo plano de fundo.."
 caelestia wallpaper -f "/home/$USERNAME/Wallpapers/mountains-dark.jpg"
 caelestia scheme set -n dynamic
@@ -171,27 +199,8 @@ EOF
 sleep 3
 
 show_header "INSTALAÇÃO FINALIZADA"
+setup_duration
 
-calc_diff() {
-    local t1=$1
-    local t2=$2
-    local diff=$((t2 - t1))
-    echo "$((diff / 3600)) $(((diff % 3600) / 60)) $((diff % 60))"
-}
-TS1=$(to_timestamp "$DATA1")
-TS2=$(to_timestamp "$DATA2")
-TS3=$(to_timestamp "$DATA3")
-read HORAS1 MINUTOS1 SEGUNDOS1 <<< "$(calc_diff "$TS1" "$TS2")"
-read HORAS2 MINUTOS2 SEGUNDOS2 <<< "$(calc_diff "$TS2" "$TS3")"
-read HORAS3 MINUTOS3 SEGUNDOS3 <<< "$(calc_diff "$TS1" "$TS3")"
-echo "────────────────────────────────────────────────────────────────────────"
-echo "Tempo total de instalação:"
-printf "%02dh %02dm %02ds\n" "$HORAS3" "$MINUTOS3" "$SEGUNDOS3"
-echo "Tempo de instalação do Arch Linux:"
-printf "%02dh %02dm %02ds\n" "$HORAS1" "$MINUTOS1" "$SEGUNDOS1"
-echo "Tempo de instalação do caelestia-shell:"
-printf "%02dh %02dm %02ds\n" "$HORAS2" "$MINUTOS2" "$SEGUNDOS2"
-echo "────────────────────────────────────────────────────────────────────────"
 echo ""
 log_success "A instalação foi concluída com sucesso.."
 echo ""
