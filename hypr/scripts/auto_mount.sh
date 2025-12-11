@@ -21,10 +21,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-
-
-
-
 check_disk_file() {
     EXIST=false
     if [[ ! -f "$DISKFILE" ]]; then
@@ -96,7 +92,6 @@ add_disks() {
         log_success "Disco '$DISKNAME' registrado como '$DISKLABEL'"
         continue
     done
-
 }
 
 mount_disks() {

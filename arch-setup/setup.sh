@@ -71,9 +71,11 @@ setup_hypr() {
     rm $HOME/.config/hypr/hyprland/input.conf
     ln -s $INPUTCONF $HOME/.config/hypr/hyprland/input.conf
     log_success "keymap.xkb exportado"
-    log_info "Definindo navegador padrão"
-    sed -i -E 's/zen-browser/firefox/' "$HOME/.config/hypr/variables.conf"
-    log_success "Navegador 'firefox' definido"
+    log_info "Copiando 'variables.conf'"
+    cp $HOME/.config/hypr/variables.conf $HOME/.config/hypr/variables.conf.bak
+    rm $HOME/.config/hypr/variables.conf
+    ln -s $HOME/.config/nk-dots/hypr/variables.conf $HOME/.config/hypr/variables.conf
+    log_success "'variables.conf' copiado"
     hyprctl reload
 }
 
@@ -99,12 +101,12 @@ setup_caelestia_theme() {
     sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml
     log_success "UserPaths.qml configurado"
     log_info "Configurando UtilitiesConfig.qml"
-    sudo cp /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml.bak
+    sudo cp /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
     sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
     log_success "UtilitiesConfig.qml configurado"
     log_info "Configurando ServiceConfig.qml"
-    sudo cp /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml.bak
+    sudo cp /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
     sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
     log_success "ServiceConfig.qml configurado"
@@ -115,26 +117,40 @@ setup_caelestia_theme() {
     log_success "SessionConfig.qml configurado"
     log_info "Criando symlink de wallpapers"
     ln -s "$HOME/.config/nk-dots/wallpapers" "$HOME/Wallpapers"
-    log_info "Reiniciando caelestia"
-    caelestia shell -k
-    sleep 2 && caelestia shell -d
-    log_info "Definindo tema"
     caelestia wallpaper -f "/home/$USERNAME/Wallpapers/mountains-dark.jpg"
     caelestia scheme set -n dynamic
+    log_info "Adicionando serviço de patch de estilos"
+    chmod +x /home/$USERNAME/.config/nk-dots/hypr/scripts/patch_style.sh
+    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/scripts/patch-style.service
+    cp /home/$USERNAME/.config/nk-dots/hypr/scripts/patch-style.service /home/$USERNAME/.config/systemd/user/patch-style.service
+    systemctl --user daemon-reload
+    systemctl --user enable --now patch-style.service
+    log_success "Serviço de patch ativado"
     log_success "Tema definido"
 }
 
 setup_vscodium() {
     log_info "Configurando VSCodium"
-    ln -s /home/$USERNAME/.local/share/caelestia/vscode/settings.json /home/$USERNAME/.config/VSCodium/User/settings.json
-    ln -s /home/$USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$USERNAME/.config/VSCodium/User/keybindings.json
-    ln -s /home/$USERNAME/.local/share/caelestia/vscode/flags.conf /home/$USERNAME/.config/codium-flags.conf
-    log_success "VSCodium configurado"
+    vscodium
+    sleep 5
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já encerrou o VSCodium?: " SPOTIFY_LOGIN
+    if [[ -n "$SPOTIFY_LOGIN" && "$SPOTIFY_LOGIN" != "s" && "$SPOTIFY_LOGIN" != "S" ]]; then
+        log_warning "Configuração do VSCodium cancelada"
+    else
+        log_info "Criando symlinks"
+        ln -s /home/$USERNAME/.local/share/caelestia/vscode/settings.json /home/$USERNAME/.config/VSCodium/User/settings.json
+        ln -s /home/$USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$USERNAME/.config/VSCodium/User/keybindings.json
+        ln -s /home/$USERNAME/.local/share/caelestia/vscode/flags.conf /home/$USERNAME/.config/codium-flags.conf
+        log_info "Aplicando extensão"
+        codium --install-extension vscode/caelestia-vscode-integration/caelestia-vscode-integration-*.vsix
+        log_success "VSCodium configurado"
+    fi
 }
 
 setup_spicetify() {
     log_info "Configurando Spotify"
     spotify-launcher
+    sleep 5
     read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você fez login no Spotify: " SPOTIFY_LOGIN
     if [[ -n "$SPOTIFY_LOGIN" && "$SPOTIFY_LOGIN" != "s" && "$SPOTIFY_LOGIN" != "S" ]]; then
         log_warning "Configuração do Spicetify cancelada"
@@ -148,12 +164,16 @@ setup_spicetify() {
         log_success "Marketplace instalado"
         log_info "Aplicando caelestia-theme"
         ln -s /home/$USERNAME/.local/share/caelestia/spicetify/Themes/caelestia/user.css /home/$USERNAME/.config/spicetify/Themes/caelestia/user.css
-        spicetify config current_theme caelestia color_scheme caelestia custom_apps marketplace
-        spicetify apply
-        log_success "caelestia-theme aplicado"
         log_info "Encerrando Spotify"
         sleep 2
         pkill -f spotify-launcher
+        while pgrep -f "spotify-launcher" >/dev/null; do
+            sleep 2
+        done
+        spicetify config current_theme caelestia color_scheme caelestia custom_apps marketplace
+        spicetify apply
+        log_success "caelestia-theme aplicado"
+        log_warmomg "Encerre o Spotify para continuar"
         while pgrep -f "spotify-launcher" >/dev/null; do
             sleep 2
         done
@@ -169,15 +189,15 @@ setup_vencord() {
 
 setup_mounts() {
     log_info "Garantindo permissões a 'auto_mount.sh'"
-    SCRIPT_PATH="/home/$USERNAME/nk-dots/hypr/scripts/auto_mount.sh"
-    SUDOERS_PATH="/etc/sudoers.d/00_$USERNAME"
+    SCRIPT_PATH="/home/$USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh --silent"
+    SUDOERS_PATH="/etc/sudoers"
     STRING="$USERNAME ALL=(ALL) NOPASSWD: $SCRIPT_PATH"
     if ! sudo grep -Fxq "$STRING" /etc/sudoers; then
         echo "$STRING" | sudo tee -a $SUDOERS_PATH >/dev/null
     fi
     log_success "Permissões garantidas"
     chmod +x $SCRIPT_PATH
-    bash "$SCRIPT_PATH" --silent
+    bash "sudo $SCRIPT_PATH"
 }
 
 setup_aur_apps() {
@@ -211,6 +231,14 @@ setup_aur_apps() {
         log_success "Millennium instalado"
     else
         log_error "A instalação do Millennium falhou"
+        log_info "Tente instalar novamente após a conclusão do script"
+    fi
+    log_info "Instalando Zen Browser"
+    paru -S --noconfirm zen-browser-bin
+    if command -v zen-browser >/dev/null 2>&1; then
+        log_success "Zen Browser instalado"
+    else
+        log_error "A instalação do Zen Browser falhou"
         log_info "Tente instalar novamente após a conclusão do script"
     fi
 }
@@ -259,6 +287,7 @@ EOF'
     log_success "Atualização automática ativada"
     log_info "Criando snapshot final"
     sudo timeshift --create --comments "[NK-DOTS] - Sistema configurado"
+    sleep 2
     log_success "Snapshot criado"
 }
 

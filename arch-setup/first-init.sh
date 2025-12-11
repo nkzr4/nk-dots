@@ -1,7 +1,8 @@
 #!/bin/bash
 # first-init.sh - Script de primeira inicialização
 # ToDo
-# Apagar resquícios de instalação
+
+# Hotkeys
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $DIR/logs.sh

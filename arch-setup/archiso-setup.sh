@@ -198,6 +198,5 @@ run setup_chroot
 
 show_header "INSTALAÇÃO FINALZIADA"
 erase_scripts
-echo ""
-read -n 1 -s -p "Pressione qualquer tecla para reiniciar..."
+sleep 5
 reboot

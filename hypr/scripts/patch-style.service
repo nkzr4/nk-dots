@@ -1,0 +1,12 @@
+[Unit]
+Description=Executa o patch do tema de aplicativos com base no caelestia-shell
+After=graphical-session.target
+
+[Service]
+ExecStart=/home/USERNAME/.config/nk-dots/hypr/scripts/patch_style.sh
+Restart=always
+RestartSec=2
+Environment=HOME=%h
+
+[Install]
+WantedBy=default.target
