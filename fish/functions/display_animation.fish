@@ -1,7 +1,6 @@
 function display_animation
-    # Script de animação ULTRA-OTIMIZADO para máxima fluidez
     
-    set frames_dir "$HOME/.config/fish/ascii_frames"
+    set frames_dir "$HOME/.config/nk-dots/fish/ascii_frames"
     set frame_delay 0.05
     
     # Verificar frames
@@ -86,6 +85,8 @@ function display_animation
         # Verificar tecla (não-bloqueante)
         set char (dd bs=1 count=1 2>/dev/null)
         if test -n "$char"
+            clear
+            tput cup 0 0
             break
         end
         
@@ -109,5 +110,5 @@ function display_animation
     stty "$old_tty"
     tput cnorm
     tput cup $max_lines 0
-    echo ""
+    clear
 end

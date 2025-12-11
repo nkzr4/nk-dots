@@ -1,7 +1,7 @@
 #!/bin/bash
 # first-init.sh - Script de primeira inicialização
 # ToDo
-# exec-once = /usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
+# Apagar resquícios de instalação
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $DIR/logs.sh
@@ -45,39 +45,134 @@ setup_caelestia() {
     done
 }
 
-setup_user() {
+setup_hypr() {
     log_info "Definindo layout do teclado"
-    KEYMAPDIR=".config/hypr/hyprland/keymap.xkb"
-    INPUTCONF="$HOME/.config/hypr/hyprland/input.conf"
+    KEYMAPDIR="$HOME/.config/nk-dots/hypr/hyprland/keymap.xkb"
+    INPUTCONF="$HOME/.config/nk-dots/hypr/hyprland/input.conf"
     if [[ "$KBLAYOUT" == "br-abnt2" ]]; then
-        sed -i -E \
-            's/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = br\
-        kb_file = \/home\/$USERNAME\/$KEYMAPDIR/' "$INPUTCONF"
+        sed -i "s/KBLAYOUT/br/g" $INPUTCONF
         log_success "Layout 'br' definido"
     else
-        sed -i -E \
-            's/^[[:space:]]*kb_layout[[:space:]]*=[[:space:]]*us[[:space:]]*$/kb_layout = us\
-        kb_file = \/home\/$USERNAME\/$KEYMAPDIR/' "$INPUTCONF"
+        sed -i "s/KBLAYOUT/us/g" $INPUTCONF
         log_success "Layout 'us' definido"
     fi
-    log_info "Exportando keymap.xkb"
-    xkbcli dump-keymap-wayland > "$HOME/$KEYMAPDIR"
+    log_info "Criando keymap.xkb"
+    xkbcli dump-keymap-wayland > "$KEYMAPDIR"
     log_info "Removendo delay do capslock"
-    sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$HOME/$KEYMAPDIR"
-    hyprctl reload
-    log_success "Keymap exportada"
+    sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$KEYMAPDIR"
+    sed -i "s@KEYMAPDIR@$KEYMAPDIR@g" $INPUTCONF
+    log_info "Exportando keymap.xkb"
+    cp $HOME/.config/hypr/hyprland/input.conf $HOME/.config/hypr/hyprland/input.conf.bak
+    rm $HOME/.config/hypr/hyprland/input.conf
+    ln -s $INPUTCONF $HOME/.config/hypr/hyprland/input.conf
+    log_success "keymap.xkb exportado"
     log_info "Definindo navegador padrão"
     sed -i -E 's/zen-browser/firefox/' "$HOME/.config/hypr/variables.conf"
     log_success "Navegador 'firefox' definido"
+    hyprctl reload
 }
 
 setup_fastfetch() {
-    log_info "Animando fastfetch"
-    cp -r "$HOME/.config/nk-dots/hypr-setup/fish/ascii_frames" "$HOME/.config/fish"
-    cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
-    cp "$HOME/.config/nk-dots/hypr-setup/fish/functions/display_animation.fish" "$HOME/.config/fish/functions/display_animation.fish"
-    cp "$HOME/.config/nk-dots/hypr-setup/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
-    log_success "Animação ASCII instalada"
+    log_info "Configurando animação ASCII"
+    log_info "Adequando fish"
+    cp "$HOME/.config/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish.bak"
+    rm "$HOME/.config/fish/functions/fish_greeting.fish"
+    ln -s "$HOME/.config/nk-dots/fish/functions/fish_greeting.fish" "$HOME/.config/fish/functions/fish_greeting.fish"
+    ln -s "$HOME/.config/nk-dots/fish/functions/display_animation.fish" "$HOME/.config/fish/functions/display_animation.fish"
+    log_info "Adequando fastfetch"
+    cp "$HOME/.config/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc.bak"
+    rm "$HOME/.config/fastfetch/config.jsonc"
+    ln -s "$HOME/.config/nk-dots/fastfetch/config.jsonc" "$HOME/.config/fastfetch/config.jsonc"
+    log_success "Animação ASCII configurada"
+}
+
+setup_caelestia_theme() {
+    log_info "Configurando UserPaths.qml"
+    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml 
+    sudo cp /etc/xdg/quickshell/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml.bak
+    sudo rm /etc/xdg/quickshell/caelestia/config/UserPaths.qml
+    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml
+    log_success "UserPaths.qml configurado"
+    log_info "Configurando UtilitiesConfig.qml"
+    sudo cp /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml.bak
+    sudo rm /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
+    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
+    log_success "UtilitiesConfig.qml configurado"
+    log_info "Configurando ServiceConfig.qml"
+    sudo cp /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml.bak
+    sudo rm /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
+    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
+    log_success "ServiceConfig.qml configurado"
+    log_info "Configurando SessionConfig.qml"
+    sudo cp /etc/xdg/quickshell/caelestia/config/SessionConfig.qml /etc/xdg/quickshell/caelestia/config/SessionConfig.qml.bak
+    sudo rm /etc/xdg/quickshell/caelestia/config/SessionConfig.qml
+    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/SessionConfig.qml /etc/xdg/quickshell/caelestia/config/SessionConfig.qml
+    log_success "SessionConfig.qml configurado"
+    log_info "Criando symlink de wallpapers"
+    ln -s "$HOME/.config/nk-dots/wallpapers" "$HOME/Wallpapers"
+    log_info "Reiniciando caelestia"
+    caelestia shell -k
+    sleep 2 && caelestia shell -d
+    log_info "Definindo tema"
+    caelestia wallpaper -f "/home/$USERNAME/Wallpapers/mountains-dark.jpg"
+    caelestia scheme set -n dynamic
+    log_success "Tema definido"
+}
+
+setup_vscodium() {
+    log_info "Configurando VSCodium"
+    ln -s /home/$USERNAME/.local/share/caelestia/vscode/settings.json /home/$USERNAME/.config/VSCodium/User/settings.json
+    ln -s /home/$USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$USERNAME/.config/VSCodium/User/keybindings.json
+    ln -s /home/$USERNAME/.local/share/caelestia/vscode/flags.conf /home/$USERNAME/.config/codium-flags.conf
+    log_success "VSCodium configurado"
+}
+
+setup_spicetify() {
+    log_info "Configurando Spotify"
+    spotify-launcher
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você fez login no Spotify: " SPOTIFY_LOGIN
+    if [[ -n "$SPOTIFY_LOGIN" && "$SPOTIFY_LOGIN" != "s" && "$SPOTIFY_LOGIN" != "S" ]]; then
+        log_warning "Configuração do Spicetify cancelada"
+    else
+        log_info "Configurando Spicetify"
+        spicetify
+        spicetify backup apply enable-devtools
+        log_info "Spicetify configurado"
+        log_info "Instalando Marketplace"
+        curl -fsSL https://raw.githubusercontent.com/spicetify/spicetify-marketplace/main/resources/install.sh | sh
+        log_success "Marketplace instalado"
+        log_info "Aplicando caelestia-theme"
+        ln -s /home/$USERNAME/.local/share/caelestia/spicetify/Themes/caelestia/user.css /home/$USERNAME/.config/spicetify/Themes/caelestia/user.css
+        spicetify config current_theme caelestia color_scheme caelestia custom_apps marketplace
+        spicetify apply
+        log_success "caelestia-theme aplicado"
+        log_info "Encerrando Spotify"
+        sleep 2
+        pkill -f spotify-launcher
+        while pgrep -f "spotify-launcher" >/dev/null; do
+            sleep 2
+        done
+        log_info "Spicetify configurado"
+    fi
+}
+
+setup_vencord() {
+    log_info "Instalando Vencord"
+    sh -c "$(curl -sS https://vencord.dev/install.sh)"
+    log_success "Vencord instalado"
+}
+
+setup_mounts() {
+    log_info "Garantindo permissões a 'auto_mount.sh'"
+    SCRIPT_PATH="/home/$USERNAME/nk-dots/hypr/scripts/auto_mount.sh"
+    SUDOERS_PATH="/etc/sudoers.d/00_$USERNAME"
+    STRING="$USERNAME ALL=(ALL) NOPASSWD: $SCRIPT_PATH"
+    if ! sudo grep -Fxq "$STRING" /etc/sudoers; then
+        echo "$STRING" | sudo tee -a $SUDOERS_PATH >/dev/null
+    fi
+    log_success "Permissões garantidas"
+    chmod +x $SCRIPT_PATH
+    bash "$SCRIPT_PATH" --silent
 }
 
 setup_aur_apps() {
@@ -97,6 +192,31 @@ setup_aur_apps() {
         log_error "A instalação do VSCodium falhou"
         log_info "Tente instalar novamente após a conclusão do script"
     fi
+    log_info "Instalando Spicetify"
+    paru -S --noconfirm spicetify-cli
+    if command -v spicetify >/dev/null 2>&1; then
+        log_success "Spicetify instalado"
+    else
+        log_error "A instalação do Spicetify falhou"
+        log_info "Tente instalar novamente após a conclusão do script"
+    fi
+    log_info "Instalando Millennium"
+    paru -S --noconfirm millennium
+    if command -v millennium >/dev/null 2>&1; then
+        log_success "Millennium instalado"
+    else
+        log_error "A instalação do Millennium falhou"
+        log_info "Tente instalar novamente após a conclusão do script"
+    fi
+}
+
+setup_hypr_execs() {
+    log_info "Configurando 'exec-onces'"
+    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/hyprland/execs.conf
+    sudo cp /home/$USERNAME/.config/hypr/hyprland/execs.conf /home/$USERNAME/.config/hypr/hyprland/execs.conf.bak
+    sudo rm /home/$USERNAME/.config/hypr/hyprland/execs.conf
+    sudo ln -s /home/$USERNAME/.config/nk-dots/hypr/hyprland/execs.conf /home/$USERNAME/.config/hypr/hyprland/execs.conf
+    log_success "'execs.conf' configurado"
 }
 
 setup_timeshift() {
@@ -111,6 +231,9 @@ setup_timeshift() {
         read -n 1 -s -p "Pressione qualquer tecla para encerrar a instalação..."
         exit 1
     fi
+    log_info "Criando snapshot inicial"
+    sudo timeshift --create --comments "[ARCH] - Instalação concluída"
+    log_success "Snapshot criada"
     log_info "Configurando GRUB-Btrfs"
     sudo /etc/grub.d/41_snapshots-btrfs
     sudo grub-mkconfig -o /boot/grub/grub.cfg
@@ -121,16 +244,16 @@ setup_timeshift() {
     log_success "GRUB-Btrfs ativado"
     log_info "Configurando atualização automática de snapshots"
     sudo mkdir -p /etc/systemd/system/grub-btrfsd.service.d
-cat <<EOF > /etc/systemd/system/grub-btrfsd.service.d/override.conf
+sudo bash -c 'cat <<EOF > /etc/systemd/system/grub-btrfsd.service.d/override.conf
 [Service]
 ExecStart=
 ExecStart=/usr/bin/grub-btrfsd --syslog -t
-EOF
+EOF'
     sudo systemctl daemon-reload
     sudo systemctl start grub-btrfsd.service
     log_success "Atualização automática ativada"
-    log_info "Criando snapshot inicial"
-    sudo timeshift --create --comments "[SNAPSHOT] - Instalação concluída"
+    log_info "Criando snapshot final"
+    sudo timeshift --create --comments "[NK-DOTS] - Sistema configurado"
     log_success "Snapshot criado"
 }
 
@@ -192,8 +315,14 @@ show_header "INSTALANDO APLICATIVOS AUR"
 run setup_aur_apps
 
 show_header "DEFININDO PREFERÊNCIAS DE USUÁRIO"
-run setup_user
+run setup_hypr
 run setup_fastfetch
+run setup_caelestia_theme
+run setup_vscodium
+run setup_spicetify
+run setup_vencord
+run setup_mounts
+run setup_hypr_execs
 
 show_header "CONFIGURANDO SNAPSHOTS"
 run setup_timeshift

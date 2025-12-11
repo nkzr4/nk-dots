@@ -173,7 +173,6 @@ erase_scripts() {
     rm $DIR/validations.sh
     rm $DIR/vars.sh
     rm $MOUNTPOINT/chroot-setup.sh
-    rm $MOUNTPOINT/links.sh
     rm $MOUNTPOINT/logs.sh
     rm $MOUNTPOINT/handler.sh
     rm $MOUNTPOINT/vars.sh
