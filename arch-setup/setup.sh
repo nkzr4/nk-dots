@@ -61,15 +61,16 @@ setup_hypr() {
         sed -i "s/KBLAYOUT/us/g" $INPUTCONF
         log_success "Layout 'us' definido"
     fi
+    sed -i "s@KEYMAPDIR@$KEYMAPDIR@g" $INPUTCONF
+    log_info "Criando symlink"
+    cp $HOME/.config/hypr/hyprland/input.conf $HOME/.config/hypr/hyprland/input.conf.bak
+    rm $HOME/.config/hypr/hyprland/input.conf
+    ln -s $INPUTCONF $HOME/.config/hypr/hyprland/input.conf
     log_info "Criando keymap.xkb"
     xkbcli dump-keymap-wayland > "$KEYMAPDIR"
     log_info "Removendo delay do capslock"
     sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$KEYMAPDIR"
-    sed -i "s@KEYMAPDIR@$KEYMAPDIR@g" $INPUTCONF
     log_info "Exportando keymap.xkb"
-    cp $HOME/.config/hypr/hyprland/input.conf $HOME/.config/hypr/hyprland/input.conf.bak
-    rm $HOME/.config/hypr/hyprland/input.conf
-    ln -s $INPUTCONF $HOME/.config/hypr/hyprland/input.conf
     log_success "keymap.xkb exportado"
     log_info "Copiando 'variables.conf'"
     cp $HOME/.config/hypr/variables.conf $HOME/.config/hypr/variables.conf.bak
@@ -142,7 +143,7 @@ setup_vscodium() {
         ln -s /home/$USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$USERNAME/.config/VSCodium/User/keybindings.json
         ln -s /home/$USERNAME/.local/share/caelestia/vscode/flags.conf /home/$USERNAME/.config/codium-flags.conf
         log_info "Aplicando extensão"
-        codium --install-extension vscode/caelestia-vscode-integration/caelestia-vscode-integration-*.vsix
+        codium --install-extension /home/$USERNAME/.local/share/caelestia/vscode/caelestia-vscode-integration/caelestia-vscode-integration-*.vsix
         log_success "VSCodium configurado"
     fi
 }
@@ -173,7 +174,7 @@ setup_spicetify() {
         spicetify config current_theme caelestia color_scheme caelestia custom_apps marketplace
         spicetify apply
         log_success "caelestia-theme aplicado"
-        log_warmomg "Encerre o Spotify para continuar"
+        log_warning "Encerre o Spotify para continuar"
         while pgrep -f "spotify-launcher" >/dev/null; do
             sleep 2
         done
@@ -188,16 +189,16 @@ setup_vencord() {
 }
 
 setup_mounts() {
-    log_info "Garantindo permissões a 'auto_mount.sh'"
-    SCRIPT_PATH="/home/$USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh --silent"
-    SUDOERS_PATH="/etc/sudoers"
-    STRING="$USERNAME ALL=(ALL) NOPASSWD: $SCRIPT_PATH"
-    if ! sudo grep -Fxq "$STRING" /etc/sudoers; then
-        echo "$STRING" | sudo tee -a $SUDOERS_PATH >/dev/null
-    fi
-    log_success "Permissões garantidas"
+    log_info "Preparando 'auto_mount.sh'"
+    SCRIPT_PATH="/home/$USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh"
+    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service"
+    sed -i "s@SCRIPTDIR@/home/$USERNAME/.config/nk-dots/hypr/scripts@g" $SCRIPT_PATH
     chmod +x $SCRIPT_PATH
-    bash "sudo $SCRIPT_PATH"
+    log_info "Ativando serviço 'auto_mount.sh'"
+    sudo systemctl daemon-reload
+    sudo systemctl enable auto-mount.service
+    log_success "Serviço configurado"
+    sh -c "sudo $SCRIPT_PATH"
 }
 
 setup_aur_apps() {

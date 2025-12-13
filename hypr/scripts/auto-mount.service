@@ -1,0 +1,14 @@
+[Unit]
+Description=Montar drivers automáticamente
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh --silent
+RemainAfterExit=yes
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -57,11 +57,6 @@ setup_apps() {
     log_info "Iniciando instalação de aplicações e dependencias"
     pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $cpu man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion gnome-keyring libsecret seahorse pacman-contrib
     log_success "Aplicações e dependências instaladas"
-    log_info "Desfazendo alterações no '/etc/pacman.conf'"
-    sudo sed -i 's/^\[multilib\]/#[multilib]/' /etc/pacman.conf
-    sudo sed -i '/^\[multilib\]/{n;s/^Include/#Include/}' /etc/pacman.conf
-    sudo sed -i '/\[sublime-text\]/,/^Server/d' /etc/pacman.conf
-    log_info "'/etc/pacman.conf' restaurado"
     log_info "Ativando serviços instalados"
     systemctl enable NetworkManager
     systemctl enable bluetooth

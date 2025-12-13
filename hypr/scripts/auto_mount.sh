@@ -1,7 +1,7 @@
 #!/bin/bash
 # auto_mount.sh - Montar drivers automáticamente
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DIR="SCRIPTDIR"
 DISKFILE="$DIR/disks.sh"
 source $DIR/logs.sh
 source $DIR/handler.sh
@@ -107,12 +107,12 @@ mount_disks() {
             DISKX="${!DISK_VAR}"
             DISKNAMEX="${!DISKNAME_VAR}"
             if mountpoint -q "/mnt/$DISKNAMEX"; then
-                sudo umount "/mnt/$DISKNAMEX"
+                umount "/mnt/$DISKNAMEX"
             fi
             log_info "Criando diretório de '$DISKX'"
-            sudo mkdir -p "/mnt/$DISKNAMEX"
+            mkdir -p "/mnt/$DISKNAMEX"
             log_info "Montando '$DISKX'"
-            [ -b $DISKX ] && sudo mount $DISKX /mnt/$DISKNAMEX
+            [ -b $DISKX ] && mount $DISKX /mnt/$DISKNAMEX
             log_success "'$DISKX' montado em '/mnt/$DISKNAMEX'"
             log_info "Criando symlink"
             [ -L "$HOME/$DISKNAMEX" ] && rm -rf $HOME/$DISKNAMEX && ln -s /mnt/$DISKNAMEX $HOME/$DISKNAMEX || ln -s /mnt/$DISKNAMEX $HOME/$DISKNAMEX
