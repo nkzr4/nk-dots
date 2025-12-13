@@ -22,7 +22,7 @@ setup_paru() {
         cd ~/.config/nk-dots/repos/paru
         log_success "Repositório clonado"
         log_info "Instalando Paru"
-        makepkg -sri
+        makepkg -si
         if command -v paru >/dev/null 2>&1; then
             log_success "Paru instalado"
             break
