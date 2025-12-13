@@ -22,6 +22,7 @@ setup_paru() {
         cd ~/.config/nk-dots/repos/paru
         log_success "Repositório clonado"
         log_info "Instalando Paru"
+        read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já alterou o PKGBUILD?"
         makepkg -si
         if command -v paru >/dev/null 2>&1; then
             log_success "Paru instalado"
@@ -134,8 +135,8 @@ setup_vscodium() {
     log_info "Configurando VSCodium"
     vscodium
     sleep 5
-    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já encerrou o VSCodium?: " SPOTIFY_LOGIN
-    if [[ -n "$SPOTIFY_LOGIN" && "$SPOTIFY_LOGIN" != "s" && "$SPOTIFY_LOGIN" != "S" ]]; then
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já encerrou o VSCodium?: " CONFIRMVSCODIUM
+    if [[ -n "$CONFIRMVSCODIUM" && "$CONFIRMVSCODIUM" != "s" && "$CONFIRMVSCODIUM" != "S" ]]; then
         log_warning "Configuração do VSCodium cancelada"
     else
         log_info "Criando symlinks"
@@ -191,10 +192,12 @@ setup_vencord() {
 setup_mounts() {
     log_info "Preparando 'auto_mount.sh'"
     SCRIPT_PATH="/home/$USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh"
-    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service"
+    sed -i "s/USERNAME/$USERNAME/g" "/home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service"
     sed -i "s@SCRIPTDIR@/home/$USERNAME/.config/nk-dots/hypr/scripts@g" $SCRIPT_PATH
+    sed -i "s@HOMEDIR@/home/$USERNAME@g" $SCRIPT_PATH
     chmod +x $SCRIPT_PATH
     log_info "Ativando serviço 'auto_mount.sh'"
+    sudo cp /home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service /etc/systemd/system/auto-mount.service
     sudo systemctl daemon-reload
     sudo systemctl enable auto-mount.service
     log_success "Serviço configurado"
@@ -204,7 +207,7 @@ setup_mounts() {
 setup_aur_apps() {
     log_info "Instalando GitHub Desktop"
     paru -S --noconfirm github-desktop-bin
-    if command -v github-desktop >/dev/null 2>&1; then
+    if paru -Q github-desktop >/dev/null 2>&1; then
         log_success "GitHub Desktop instalado"
     else
         log_error "A instalação do GitHub Desktop falhou"
@@ -212,7 +215,7 @@ setup_aur_apps() {
     fi
     log_info "Instalando VSCodium"
     paru -S --noconfirm vscodium-bin
-    if command -v vscodium >/dev/null 2>&1; then
+    if paru -Q vscodium >/dev/null 2>&1; then
         log_success "VSCodium instalado"
     else
         log_error "A instalação do VSCodium falhou"
@@ -220,23 +223,30 @@ setup_aur_apps() {
     fi
     log_info "Instalando Spicetify"
     paru -S --noconfirm spicetify-cli
-    if command -v spicetify >/dev/null 2>&1; then
+    if paru -Q spicetify-cli >/dev/null 2>&1; then
         log_success "Spicetify instalado"
     else
         log_error "A instalação do Spicetify falhou"
         log_info "Tente instalar novamente após a conclusão do script"
     fi
     log_info "Instalando Millennium"
-    paru -S --noconfirm millennium
-    if command -v millennium >/dev/null 2>&1; then
-        log_success "Millennium instalado"
+    log_info "Atualizando Steam"
+    steam
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já atualizou a Steam?: " CONFIRMSTEAM
+    if [[ -n "$CONFIRMSTEAM" && "$CONFIRMSTEAM" != "s" && "$CONFIRMSTEAM" != "S" ]]; then
+        log_warning "Configuração do Millennium cancelada"
     else
-        log_error "A instalação do Millennium falhou"
-        log_info "Tente instalar novamente após a conclusão do script"
+        paru -S --noconfirm millennium
+        if paru -Q millennium >/dev/null 2>&1; then
+            log_success "Millennium instalado"
+        else
+            log_error "A instalação do Millennium falhou"
+            log_info "Tente instalar novamente após a conclusão do script"
+        fi
     fi
     log_info "Instalando Zen Browser"
     paru -S --noconfirm zen-browser-bin
-    if command -v zen-browser >/dev/null 2>&1; then
+    if paru -Q zen-browser >/dev/null 2>&1; then
         log_success "Zen Browser instalado"
     else
         log_error "A instalação do Zen Browser falhou"

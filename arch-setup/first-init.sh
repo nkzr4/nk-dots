@@ -1,8 +1,5 @@
 #!/bin/bash
 # first-init.sh - Script de primeira inicialização
-# ToDo
-
-# Hotkeys
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $DIR/logs.sh
@@ -45,5 +42,5 @@ run setup_duration
 echo ""
 log_success "A instalação foi concluída com sucesso"
 echo ""
-read -n 1 -s -p "Pressione qualquer tecla para encerrar.."
-exit 1
+read -n 1 -s -p "Pressione qualquer tecla para reiniciar.."
+sudo reboot now

@@ -115,7 +115,7 @@ mount_disks() {
             [ -b $DISKX ] && mount $DISKX /mnt/$DISKNAMEX
             log_success "'$DISKX' montado em '/mnt/$DISKNAMEX'"
             log_info "Criando symlink"
-            [ -L "$HOME/$DISKNAMEX" ] && rm -rf $HOME/$DISKNAMEX && ln -s /mnt/$DISKNAMEX $HOME/$DISKNAMEX || ln -s /mnt/$DISKNAMEX $HOME/$DISKNAMEX
+            [ -L "HOMEDIR/$DISKNAMEX" ] && rm -rf HOMEDIR/$DISKNAMEX && ln -s /mnt/$DISKNAMEX HOMEDIR/$DISKNAMEX || ln -s /mnt/$DISKNAMEX HOMEDIR/$DISKNAMEX
             log_success "'$DISKX' cadastrado"
             i=$((i - 1))
             continue
