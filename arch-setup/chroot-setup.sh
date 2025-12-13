@@ -168,6 +168,10 @@ show_header "INSTALANDO APLICAÇÕES"
 run setup_apps
 
 show_header "PREPARANDO INICIALIZAÇÃO"
-run setup_boot
+if [[ "$DUAL" == false ]]; then
+    run setup_boot
+else
+    run setup_boot_dual
+fi
 run setup_autologin "$USERNAME"
 log_info "Saindo de ambiente chroot"
