@@ -1,6 +1,12 @@
 #!/bin/bash
 # first-init.sh - Script de primeira inicialização
 
+# ToDo
+# Remover wait do archiso-setup e colocar links pra baixar silenciosamente
+# Alternativa para executar todo o código sem precisar digitar senha
+# Rever inputs de encerramento dos programas (Spotify, VSCodium e Steam)
+# Instalar tema do GRUB (dentro do /boot)
+
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source $DIR/logs.sh
 source $DIR/handler.sh

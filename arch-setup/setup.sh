@@ -297,8 +297,8 @@ EOF'
     sudo systemctl start grub-btrfsd.service
     log_success "Atualização automática ativada"
     log_info "Criando snapshot final"
-    sudo timeshift --create --comments "[NK-DOTS] - Sistema configurado"
     sleep 2
+    sudo timeshift --create --comments "[NK-DOTS] - Sistema configurado"
     log_success "Snapshot criado"
 }
 

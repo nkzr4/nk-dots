@@ -106,6 +106,45 @@ EOF
     chown -R $USERNAME:wheel /home/$USERNAME/.config
 }
 
+setup_boot_dual() {
+    log_info "Configurando mkinitcpio.conf"
+    sed -i 's/^MODULES=.*/MODULES=(btrfs)/' /etc/mkinitcpio.conf
+    sed -i '/^HOOKS=/ s/filesystems/sd-encrypt filesystems/' /etc/mkinitcpio.conf
+    mkinitcpio -p linux
+    log_success "mkinitcpio configurado"
+    log_info "Configurando GRUB"
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch
+    DISK_LUKS_UUID=$(blkid -s UUID -o value $LINUXPART)
+    sed -i "s|GRUB_CMDLINE_LINUX=\"\"|GRUB_CMDLINE_LINUX=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
+    sed -i 's/^#GRUB_DISABLE_OS_PROBER=.*/GRUB_DISABLE_OS_PROBER=false/' /etc/default/grub
+    grub-mkconfig -o /boot/grub/grub.cfg
+    log_success "GRUB configurado"
+    log_info "Configurando primeira inicialização"
+    mkdir -p /home/$USERNAME/.config/hypr
+    git clone https://github.com/nkzr4/nk-dots.git /home/$USERNAME/.config/nk-dots
+    DATE2=$(date +"%Y-%m-%d %H:%M:%S")
+cat >> $DIR/vars.sh <<EOF
+DATE2="$DATE2"
+EOF
+    cp /vars.sh /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
+    chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/first-init.sh
+    chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/logs.sh
+    chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/handler.sh
+    chmod +x /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh
+    log_success "Primeira inicialização configurada"
+    log_info "Preparando inicialização do hyprland"
+    sed -i -E "s/\bUSERNAME\b/$USERNAME/g" /home/$USERNAME/.config/nk-dots/arch-setup/hyprland.conf.default
+    cp /home/$USERNAME/.config/nk-dots/arch-setup/hyprland.conf.default /home/$USERNAME/.config/hypr/hyprland.conf
+cat >> /home/$USERNAME/.bash_profile << 'EOF'
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+    exec Hyprland
+fi
+EOF
+    chown $USERNAME:wheel /home/$USERNAME/.bash_profile
+    log_success "Inicialização do hyprland configurada"
+    chown -R $USERNAME:wheel /home/$USERNAME/.config
+}
+
 setup_autologin() {
     local USERNAME="$1"
     log_info "Configurando autologin de '$USERNAME' no tty1"

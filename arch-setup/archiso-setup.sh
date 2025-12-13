@@ -145,6 +145,49 @@ setup_disk() {
     log_success "'$DISKNAME1' montado"
 }
 
+setup_disk_dual() {
+    if [[ $(cat /sys/block/$(basename "$DISK")/queue/rotational) -eq 0 ]]; then
+        SSDIFSSD=",ssd"
+    else
+        SSDIFSSD=""
+    fi
+    log_info "Criando partições"
+    sgdisk -n ${LINUX_PART_NUM}:0:0 -t ${LINUX_PART_NUM}:8300 $DISK
+    log_success "Partição '$LINUXPART' criada com sucesso.."
+    log_info "Configurando criptografia de '$LINUXPART'"
+    echo -n "$LUKSPASSWD" > /tmp/keyfile
+    chmod 600 /tmp/keyfile
+    cryptsetup luksFormat "$LINUXPART" --batch-mode --key-file=/tmp/keyfile
+    cryptsetup luksOpen "$LINUXPART" main --key-file=/tmp/keyfile
+    rm -f /tmp/keyfile
+    log_success "Partição '$LINUXPART' criptografada"
+    log_info "Definindo '$LINUXPART' como Btrfs.."
+    mkfs.btrfs /dev/mapper/main
+    log_success "'$LINUXPART' definido como Btrfs"
+    log_info "Criando subvolumes Btrfs"
+    mount /dev/mapper/main $MOUNTPOINT
+    cd $MOUNTPOINT
+    btrfs subvolume create @
+    btrfs subvolume create @home
+    btrfs subvolume create @snapshots
+    btrfs subvolume list $MOUNTPOINT
+    cd
+    umount $MOUNTPOINT
+    log_success "Subvolumes Btrfs criados"
+    log_info "Montando subvolumes"
+    mount -o noatime$SSDIFSSD,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/main $MOUNTPOINT
+    mkdir $MOUNTPOINT/home
+    mount -o noatime$SSDIFSSD,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/main $MOUNTPOINT/home
+    mkdir $MOUNTPOINT/.snapshots
+    mount -o noatime$SSDIFSSD,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/main $MOUNTPOINT/.snapshots
+    findmnt -t btrfs
+    log_success "Subvolumes montados"
+    log_info "Montando '$EFI_PART'"
+    mkdir -p $MOUNTPOINT/boot
+    mount $EFI_PART $MOUNTPOINT/boot
+    log_success "'$EFI_PART' montado"
+}
+
 setup_bootsrap() {
     log_info "Inicializando sistema de arquivos raiz"
     pacstrap $MOUNTPOINT base linux linux-headers linux-firmware nano btrfs-progs grub efibootmgr --noconfirm
@@ -184,11 +227,16 @@ get_input_info
 
 show_header "CONFIRMANDO INFORMAÇÕES"
 run validate_overview
+source $DIR/vars.sh
 log_info "Atualizando Arch ISO"
 run pacman -Syy --noconfirm
 
 show_header "PREPARANDO DISCO BTRFS"
-run setup_disk
+if [[ "$DUAL" == false ]]; then
+    run setup_disk
+else
+    run setup_disk_dual
+fi
 
 show_header "EXECUTANDO PACSTRAP"
 run setup_bootsrap

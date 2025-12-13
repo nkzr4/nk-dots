@@ -280,6 +280,19 @@ validate_overview () {
         read -n 1 -s -p "Pressione qualquer tecla para encerrar a instalação..."
         exit 1
     fi
+    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Deseja fazer a instalação no modo dual boot? (s/N): " DUAL_CONFIRM
+    if [[ -n "$DUAL_CONFIRM" && "$DUAL_CONFIRM" != "s" && "$DUAL_CONFIRM" != "S" ]]; then
+        DUALBOOLEAN=false
+    else
+        DUALBOOLEAN=true
+    fi
+    EFI_PART=$(lsblk -lpno NAME,PARTTYPE $DISK | awk '$2=="c12a7328-f81f-11d2-ba4b-00a0c93ec93b"{print $1}')
+    LINUX_PART_NUM=$(sgdisk -p $DISK | awk 'END{print $1+1}')
+    if [[ "$DISK" =~ nvme ]]; then
+        LINUXPART="${DISK}p${LINUX_PART_NUM}"
+    else
+        LINUXPART="${DISK}${LINUX_PART_NUM}"
+    fi
     log_info "Exportando variáveis"
 cat <<EOF > $DIR/vars.sh
 KBLAYOUT="$KBLAYOUT"
@@ -297,6 +310,10 @@ USERNAME="$USERNAME"
 USERPASSWD="$USERPASSWD"
 LUKSPASSWD="$LUKSPASSWD"
 DATE1="$DATE1"
+DUAL="$DUALBOOLEAN"
+EFI_PART="$EFI_PART"
+LINUX_PART_NUM="$LINUX_PART_NUM"
+LINUXPART="$LINUXPART"
 EOF
     if [[ ! -f "$DIR/vars.sh" ]]; then
         log_error "Arquivo 'vars.sh' inexistente"
