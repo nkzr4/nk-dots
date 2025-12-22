@@ -55,7 +55,7 @@ setup_hypr() {
     log_info "Definindo layout do teclado"
     KEYMAPDIR="$HOME/.config/nk-dots/hypr/hyprland/keymap.xkb"
     INPUTCONF="$HOME/.config/nk-dots/hypr/hyprland/input.conf"
-    if [[ "$KBLAYOUT" == "br-abnt2" ]]; then
+    if [[ "$VAR_KBLAYOUT" == "br-abnt2" ]]; then
         sed -i "s/KBLAYOUT/br/g" $INPUTCONF
         log_success "Layout 'br' definido"
     else
@@ -97,34 +97,34 @@ setup_fastfetch() {
 
 setup_caelestia_theme() {
     log_info "Configurando UserPaths.qml"
-    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml 
+    sed -i "s/USERNAME/$VAR_USERNAME/g" /home/$VAR_USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml 
     sudo cp /etc/xdg/quickshell/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/UserPaths.qml
-    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml
+    sudo ln -s /home/$VAR_USERNAME/.config/nk-dots/caelestia/config/UserPaths.qml /etc/xdg/quickshell/caelestia/config/UserPaths.qml
     log_success "UserPaths.qml configurado"
     log_info "Configurando UtilitiesConfig.qml"
     sudo cp /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
-    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
+    sudo ln -s /home/$VAR_USERNAME/.config/nk-dots/caelestia/config/UtilitiesConfig.qml /etc/xdg/quickshell/caelestia/config/UtilitiesConfig.qml
     log_success "UtilitiesConfig.qml configurado"
     log_info "Configurando ServiceConfig.qml"
     sudo cp /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
-    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
+    sudo ln -s /home/$VAR_USERNAME/.config/nk-dots/caelestia/config/ServiceConfig.qml /etc/xdg/quickshell/caelestia/config/ServiceConfig.qml
     log_success "ServiceConfig.qml configurado"
     log_info "Configurando SessionConfig.qml"
     sudo cp /etc/xdg/quickshell/caelestia/config/SessionConfig.qml /etc/xdg/quickshell/caelestia/config/SessionConfig.qml.bak
     sudo rm /etc/xdg/quickshell/caelestia/config/SessionConfig.qml
-    sudo ln -s /home/$USERNAME/.config/nk-dots/caelestia/config/SessionConfig.qml /etc/xdg/quickshell/caelestia/config/SessionConfig.qml
+    sudo ln -s /home/$VAR_USERNAME/.config/nk-dots/caelestia/config/SessionConfig.qml /etc/xdg/quickshell/caelestia/config/SessionConfig.qml
     log_success "SessionConfig.qml configurado"
     log_info "Criando symlink de wallpapers"
     ln -s "$HOME/.config/nk-dots/wallpapers" "$HOME/Wallpapers"
-    caelestia wallpaper -f "/home/$USERNAME/Wallpapers/mountains-dark.jpg"
+    caelestia wallpaper -f "/home/$VAR_USERNAME/Wallpapers/mountains-dark.jpg"
     caelestia scheme set -n dynamic
     log_info "Adicionando serviço de patch de estilos"
-    chmod +x /home/$USERNAME/.config/nk-dots/hypr/scripts/patch_style.sh
-    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/scripts/patch-style.service
-    cp /home/$USERNAME/.config/nk-dots/hypr/scripts/patch-style.service /home/$USERNAME/.config/systemd/user/patch-style.service
+    chmod +x /home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/patch_style.sh
+    sed -i "s/USERNAME/$VAR_USERNAME/g" /home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/patch-style.service
+    cp /home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/patch-style.service /home/$VAR_USERNAME/.config/systemd/user/patch-style.service
     systemctl --user daemon-reload
     systemctl --user enable --now patch-style.service
     log_success "Serviço de patch ativado"
@@ -140,11 +140,11 @@ setup_vscodium() {
         log_warning "Configuração do VSCodium cancelada"
     else
         log_info "Criando symlinks"
-        ln -s /home/$USERNAME/.local/share/caelestia/vscode/settings.json /home/$USERNAME/.config/VSCodium/User/settings.json
-        ln -s /home/$USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$USERNAME/.config/VSCodium/User/keybindings.json
-        ln -s /home/$USERNAME/.local/share/caelestia/vscode/flags.conf /home/$USERNAME/.config/codium-flags.conf
+        ln -s /home/$VAR_USERNAME/.local/share/caelestia/vscode/settings.json /home/$VAR_USERNAME/.config/VSCodium/User/settings.json
+        ln -s /home/$VAR_USERNAME/.local/share/caelestia/vscode/keybindings.json /home/$VAR_USERNAME/.config/VSCodium/User/keybindings.json
+        ln -s /home/$VAR_USERNAME/.local/share/caelestia/vscode/flags.conf /home/$VAR_USERNAME/.config/codium-flags.conf
         log_info "Aplicando extensão"
-        codium --install-extension /home/$USERNAME/.local/share/caelestia/vscode/caelestia-vscode-integration/caelestia-vscode-integration-*.vsix
+        codium --install-extension /home/$VAR_USERNAME/.local/share/caelestia/vscode/caelestia-vscode-integration/caelestia-vscode-integration-*.vsix
         log_success "VSCodium configurado"
     fi
 }
@@ -165,7 +165,7 @@ setup_spicetify() {
         curl -fsSL https://raw.githubusercontent.com/spicetify/spicetify-marketplace/main/resources/install.sh | sh
         log_success "Marketplace instalado"
         log_info "Aplicando caelestia-theme"
-        ln -s /home/$USERNAME/.local/share/caelestia/spicetify/Themes/caelestia/user.css /home/$USERNAME/.config/spicetify/Themes/caelestia/user.css
+        ln -s /home/$VAR_USERNAME/.local/share/caelestia/spicetify/Themes/caelestia/user.css /home/$VAR_USERNAME/.config/spicetify/Themes/caelestia/user.css
         log_info "Encerrando Spotify"
         sleep 2
         pkill -f spotify-launcher
@@ -191,13 +191,13 @@ setup_vencord() {
 
 setup_mounts() {
     log_info "Preparando 'auto_mount.sh'"
-    SCRIPT_PATH="/home/$USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh"
-    sed -i "s/USERNAME/$USERNAME/g" "/home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service"
-    sed -i "s@SCRIPTDIR@/home/$USERNAME/.config/nk-dots/hypr/scripts@g" $SCRIPT_PATH
-    sed -i "s@HOMEDIR@/home/$USERNAME@g" $SCRIPT_PATH
+    SCRIPT_PATH="/home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/auto_mount.sh"
+    sed -i "s/USERNAME/$VAR_USERNAME/g" "/home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service"
+    sed -i "s@SCRIPTDIR@/home/$VAR_USERNAME/.config/nk-dots/hypr/scripts@g" $SCRIPT_PATH
+    sed -i "s@HOMEDIR@/home/$VAR_USERNAME@g" $SCRIPT_PATH
     chmod +x $SCRIPT_PATH
     log_info "Ativando serviço 'auto_mount.sh'"
-    sudo cp /home/$USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service /etc/systemd/system/auto-mount.service
+    sudo cp /home/$VAR_USERNAME/.config/nk-dots/hypr/scripts/auto-mount.service /etc/systemd/system/auto-mount.service
     sudo systemctl daemon-reload
     sudo systemctl enable auto-mount.service
     log_success "Serviço configurado"
@@ -256,10 +256,10 @@ setup_aur_apps() {
 
 setup_hypr_execs() {
     log_info "Configurando 'exec-onces'"
-    sed -i "s/USERNAME/$USERNAME/g" /home/$USERNAME/.config/nk-dots/hypr/hyprland/execs.conf
-    sudo cp /home/$USERNAME/.config/hypr/hyprland/execs.conf /home/$USERNAME/.config/hypr/hyprland/execs.conf.bak
-    sudo rm /home/$USERNAME/.config/hypr/hyprland/execs.conf
-    sudo ln -s /home/$USERNAME/.config/nk-dots/hypr/hyprland/execs.conf /home/$USERNAME/.config/hypr/hyprland/execs.conf
+    sed -i "s/USERNAME/$VAR_USERNAME/g" /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland/execs.conf
+    sudo cp /home/$VAR_USERNAME/.config/hypr/hyprland/execs.conf /home/$VAR_USERNAME/.config/hypr/hyprland/execs.conf.bak
+    sudo rm /home/$VAR_USERNAME/.config/hypr/hyprland/execs.conf
+    sudo ln -s /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland/execs.conf /home/$VAR_USERNAME/.config/hypr/hyprland/execs.conf
     log_success "'execs.conf' configurado"
 }
 
@@ -307,7 +307,7 @@ setup_ending() {
     rm -rf ~/.config/nk-dots/repos
     log_info "Concluindo instalação"
     DATE3=$(date +"%Y-%m-%d %H:%M:%S")
-cat >> /home/$USERNAME/.config/nk-dots/arch-setup/vars.sh <<EOF
+cat >> /home/$VAR_USERNAME/.config/nk-dots/arch-setup/vars.sh <<EOF
 DATE3="$DATE3"
 EOF
     sleep 3
