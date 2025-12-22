@@ -1,8 +1,8 @@
 #!/bin/bash
-# setup.sh - Script de serviços para setup
+# first-init-services.sh - Script de serviços para setup
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $DIR/logs.sh
+source $DIR/logger.sh
 source $DIR/handler.sh
 source $DIR/vars.sh
 

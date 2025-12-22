@@ -1,9 +1,12 @@
 #!/bin/bash
+# handler.sh
 
-DIR="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)"
-source "$DIR/logs.sh"
+DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+source "$DIR/logger.sh"
 
+set -o errexit
 set -o errtrace
+set -o pipefail
 
 _stacktrace() {
     for ((i=1; i<${#BASH_SOURCE[@]}; i++)); do
@@ -31,16 +34,34 @@ _error_handler() {
 }
 
 run() {
-    
     local fn="$1"
     shift
-
     trap "_error_handler \"$fn\"" ERR
-
     "$fn" "$@"
     local status=$?
-
     trap - ERR
-
     return $status
+}
+
+fatal() {
+    log_error "$*" >&2
+    echo
+    read -n 1 -s -p "Pressione qualquer tecla para encerrar a instalação..."
+    exit 1
+}
+
+show_header() {
+    local title="$1"
+    local width=72
+    local title_len=${#title}
+    local total_spaces=$((width - title_len))
+    local left_spaces=$(( (total_spaces ) / 2 ))
+    local right_spaces=$(( total_spaces - left_spaces ))
+    local left_string="$(printf '%*s' "$left_spaces" '')"
+    local right_string="$(printf '%*s' "$right_spaces" '')"
+    clear
+    echo "╭──────────────────────────────────────────────────────────────────────────╮"
+    echo -e "│$left_string" "${BOLD}${MAGENTA}$title${RESET}" "$right_string│"
+    echo "╰──────────────────────────────────────────────────────────────────────────╯"
+    echo ""
 }
