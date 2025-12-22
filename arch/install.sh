@@ -2,13 +2,13 @@
 # install.sh
 
 DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-LOGGERLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/logger.sh"
-HANDLERLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/handler.sh"
-SETTINGSLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/settings.sh"
-DISKLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/disk.sh"
-SYSTEMLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/system.sh"
-BOOTLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/services/boot.sh"
-CHROOTLINK="https://raw.githubusercontent.com/nkzr4/nk-dots-refact/refs/heads/main/arch/chroot.sh"
+LOGGERLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/logger.sh"
+HANDLERLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/handler.sh"
+SETTINGSLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/settings.sh"
+DISKLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/disk.sh"
+SYSTEMLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/system.sh"
+BOOTLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/services/boot.sh"
+CHROOTLINK="https://raw.githubusercontent.com/nkzr4/nk-dots/refs/heads/main/arch/chroot.sh"
 
 check_internet() {
     curl -fsS --max-time 3 https://geo.mirror.pkgbuild.com >/dev/null
