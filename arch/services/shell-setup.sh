@@ -306,37 +306,5 @@ setup_ending() {
     log_info "Removendo diretórios temporários"
     rm -rf ~/.config/nk-dots/repos
     log_info "Concluindo instalação"
-    DATE3=$(date +"%Y-%m-%d %H:%M:%S")
-cat >> /home/$VAR_USERNAME/.config/nk-dots/arch-setup/vars.sh <<EOF
-DATE3="$DATE3"
-EOF
     sleep 3
-}
-
-calc_time_diff() {
-    local t1=$1
-    local t2=$2
-    local diff=$((t2 - t1))
-    echo "$((diff / 3600)) $(((diff % 3600) / 60)) $((diff % 60))"
-}
-
-to_timestamp() {
-    date -d "$1" +%s 2>/dev/null
-}
-
-setup_duration() {
-    TS1=$(to_timestamp "$DATE1")
-    TS2=$(to_timestamp "$DATE2")
-    TS3=$(to_timestamp "$DATE3")
-    read HORAS1 MINUTOS1 SEGUNDOS1 <<< "$(calc_time_diff "$TS1" "$TS2")"
-    read HORAS2 MINUTOS2 SEGUNDOS2 <<< "$(calc_time_diff "$TS2" "$TS3")"
-    read HORAS3 MINUTOS3 SEGUNDOS3 <<< "$(calc_time_diff "$TS1" "$TS3")"
-    echo "────────────────────────────────────────────────────────────────────────"
-    echo "Tempo total de instalação:"
-    printf "%02dh %02dm %02ds\n" "$HORAS3" "$MINUTOS3" "$SEGUNDOS3"
-    echo "Tempo de instalação do Arch Linux:"
-    printf "%02dh %02dm %02ds\n" "$HORAS1" "$MINUTOS1" "$SEGUNDOS1"
-    echo "Tempo de instalação do NK-DOTS:"
-    printf "%02dh %02dm %02ds\n" "$HORAS2" "$MINUTOS2" "$SEGUNDOS2"
-    echo "────────────────────────────────────────────────────────────────────────"
 }

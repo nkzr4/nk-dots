@@ -1,5 +1,5 @@
 #!/bin/bash
-# first-init.sh - Script de primeira inicialização
+# shell.sh - Script de primeira inicialização
 
 # ToDo
 # Remover wait do archiso-setup e colocar links pra baixar silenciosamente
@@ -8,10 +8,7 @@
 # Instalar tema do GRUB (dentro do /boot)
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $DIR/logger.sh
-source $DIR/handler.sh
-source $DIR/vars.sh
-source $DIR/first-init-services.sh
+source $DIR/services/shell-setup.sh
 
 check_internet() {
     curl -fsS --max-time 3 https://geo.mirror.pkgbuild.com >/dev/null
@@ -47,8 +44,6 @@ if check_internet; then
     run setup_ending
 
     show_header "INSTALAÇÃO FINALIZADA"
-    run setup_duration
-    echo ""
     log_success "A instalação foi concluída com sucesso"
     echo ""
     read -n 1 -s -p "Pressione qualquer tecla para reiniciar.."

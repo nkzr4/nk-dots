@@ -53,7 +53,6 @@ set_partitions() {
 
 set_cryptsetup() {
     log_info "Configurando criptografia"
-    command -v cryptsetup >/dev/null || fatal "cryptsetup não disponível"
     read -r LUKSPASSWD < /tmp/LUKSPASSWD.pass
     rm -f /tmp/LUKSPASSWD.pass
     [[ -n "$LUKSPASSWD" ]] || fatal "Senha LUKS vazia"
@@ -61,7 +60,7 @@ set_cryptsetup() {
     printf '%s' "$LUKSPASSWD" | cryptsetup luksOpen "$LINUX_PARTITION" main - || fatal "Falha ao abrir volume LUKS"
     [[ -b /dev/mapper/main ]] || fatal "Mapper LUKS não foi criado"
     unset LUKSPASSWD
-    log_success "Partição criptografada"
+    log_success "Partição criptogarafada"
 }
 
 set_btrfs_volumes() {
@@ -83,11 +82,16 @@ set_mounts() {
     log_info "Montando partições"
     check_if_ssd
     mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/main /mnt || fatal "Falha ao montar subvolume @"
+    mountpoint -q /mnt || fatal "/mnt não está montado"
     mkdir -p /mnt/{boot,home,var/log,var/cache/pacman/pkg,.snapshots}
     mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/main /mnt/home || fatal "Falha ao montar @home"
-    mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/main /mnt/var/log || fatal "Falha ao montar @log"
-    mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/main /mnt/var/cache/pacman/pkg || fatal "Falha ao montar @pkg"
+    mountpoint -q /mnt/home || fatal "home não montado"
+    mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/main /mnt/var/log || fatal "Falha ao montar @log"
+    mountpoint -q /mnt/var/log || fatal "log não montado"
+    mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/main /mnt/var/cache/pacman/pkg || fatal "Falha ao montar @pkg"
+    mountpoint -q /mnt/var/cache/pacman/pkg || fatal "pkg não montado"
     mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/main /mnt/.snapshots || fatal "Falha ao montar @snapshots"
+    mountpoint -q /mnt/.snapshots || fatal "snapshots não montado"
     mkfs.fat -F32 "$EFI_PARTITION" || fatal "Falha ao formatar EFI"
     mount "$EFI_PARTITION" /mnt/boot || fatal "Falha ao montar EFI"
     mountpoint -q /mnt/boot || fatal "EFI não montada corretamente"
@@ -96,9 +100,11 @@ set_mounts() {
 
 download_pacstrap() {
     log_info "Criando sistema raiz"
-    command -v pacstrap >/dev/null || fatal "pacstrap indisponível"
+    [[ -b /dev/mapper/main ]] || fatal "/dev/mapper/main não existe — LUKS não aberto"
     pacstrap /mnt base linux linux-headers linux-firmware nano btrfs-progs grub efibootmgr --noconfirm || fatal "Falha no pacstrap"
+    [[ -d /mnt/etc ]] || fatal "/mnt/etc não foi criado — pacstrap falhou parcialmente"
     genfstab -U /mnt > /mnt/etc/fstab || fatal "Falha ao gerar fstab"
-    [[ -s /mnt/etc/fstab ]] || fatal "fstab gerado está vazio"
+    grep -q "/dev/mapper/main" /mnt/etc/fstab || fatal "fstab não contém mapper/main"
+    grep -q "subvol=@ " /mnt/etc/fstab || fatal "fstab não contém subvol=@"
     log_success "Bootstrap concluído"
 }
