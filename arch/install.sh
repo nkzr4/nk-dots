@@ -54,14 +54,14 @@ start_chroot() {
 
 countdown_reboot() {
     for i in 5 4 3 2 1 0; do
-        echo "Reiniciando em $i..."
+        show_header "INSTALAÇÃO FINALIZADA"
+        log_info "Reiniciando em $i..."
         sleep 1
     done
     reboot
 }
 
 finish_setup() {
-    show_header "INSTALAÇÃO FINALZIADA"
     rm -rf /root/services
     rm -rf /mnt/services
     rm /mnt/chroot.sh

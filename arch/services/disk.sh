@@ -105,6 +105,5 @@ download_pacstrap() {
     [[ -d /mnt/etc ]] || fatal "/mnt/etc não foi criado — pacstrap falhou parcialmente"
     genfstab -U /mnt > /mnt/etc/fstab || fatal "Falha ao gerar fstab"
     grep -q "/dev/mapper/main" /mnt/etc/fstab || fatal "fstab não contém mapper/main"
-    grep -q "subvol=@ " /mnt/etc/fstab || fatal "fstab não contém subvol=@"
     log_success "Bootstrap concluído"
 }

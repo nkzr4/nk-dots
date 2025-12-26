@@ -41,7 +41,7 @@ set_repos() {
     git clone https://github.com/nkzr4/nk-dots.git /home/$VAR_USERNAME/.config/nk-dots || fatal "Falha ao clonar nk-dots"
     [[ -d /home/$VAR_USERNAME/.config/nk-dots ]] || fatal "Repositório não encontrado após clone"
     cp /services/vars.sh /home/$VAR_USERNAME/.config/nk-dots/arch/services/vars.sh || fatal "Falha ao copiar vars.sh"
-    chmod +x /home/$VAR_USERNAME/.config/nk-dots/arch/services/first-init.sh
+    chmod +x /home/$VAR_USERNAME/.config/nk-dots/arch/shell.sh
 }
 
 set_autohypr() {
@@ -61,7 +61,6 @@ set_autologin() {
     mkdir -p /etc/systemd/system/getty@tty1.service.d || fatal "Falha ao criar diretório systemd override"
     cat_autologin_conf
     [[ -f /etc/systemd/system/getty@tty1.service.d/autologin.conf ]] || fatal "Arquivo autologin.conf não foi criado"
-    systemctl daemon-reload || fatal "daemon-reload falhou"
     systemctl enable getty@tty1.service || fatal "Falha ao habilitar autologin"
     systemctl is-enabled getty@tty1.service >/dev/null || fatal "Autologin não está habilitado"
     chown -R $VAR_USERNAME:wheel /home/$VAR_USERNAME/.config
