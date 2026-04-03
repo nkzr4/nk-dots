@@ -54,17 +54,9 @@ check_sys_vendor() {
 }
 
 set_sys_pacman() {
-    log_info "Preparando repositórios específicos"
-    curl -O https://download.sublimetext.com/sublimehq-pub.gpg
-    pacman-key --add sublimehq-pub.gpg
-    pacman-key --lsign-key 8A8F901A
-    rm sublimehq-pub.gpg
-    echo -e "\n[sublime-text]\nServer = https://download.sublimetext.com/arch/stable/x86_64" >> /etc/pacman.conf
-    sed -i 's/^#\[multilib\]/[multilib]/' /etc/pacman.conf
-    sed -i '/^\[multilib\]/{n;s/^#Include/Include/}' /etc/pacman.conf	
     log_info "Instalando aplicações e dependencias"
     check_sys_vendor
-    pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant mtools dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $CPU man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp noto-fonts ttf-font-awesome vlc vlc-plugins-all okular sublime-text spotify-launcher discord steam libreoffice-fresh qbittorrent virtualbox virtualbox-host-modules-arch inotify-tools fish gnome-calculator obs-studio bash-completion gnome-keyring libsecret seahorse pacman-contrib firefox
+    pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber pavucontrol bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $CPU man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar waybar wofi xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp inotify-tools noto-fonts ttf-font-awesome ttf-jetbrains-mono-nerd
 }
     
 enable_sys_services() {
