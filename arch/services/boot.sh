@@ -10,7 +10,6 @@ config_boot() {
     run set_mkinitcpio_conf
     run set_grub_conf
     run set_repos
-    run set_autohypr
     run set_autologin
 }
 
@@ -46,18 +45,6 @@ set_repos() {
     chmod +x /home/$VAR_USERNAME/.config/nk-dots/arch/shell.sh
 }
 
-set_autohypr() {
-    log_info "Preparando inicialização do hyprland"
-    [[ -f /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland.conf.default ]] || fatal "hyprland.conf.default não encontrado"
-    sed -i -E "s/\bUSERNAME\b/$VAR_USERNAME/g" /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland.conf.default || fatal "Falha ao configurar hyprland.conf"
-    grep -q "$VAR_USERNAME" /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland.conf.default || fatal "Username não foi aplicado no Hyprland conf"
-    mkdir -p /home/$VAR_USERNAME/.config/hypr
-    cp /home/$VAR_USERNAME/.config/nk-dots/hypr/hyprland.conf.default /home/$VAR_USERNAME/.config/hypr/hyprland.conf
-    cat_bash_profile
-    [[ -f /home/$VAR_USERNAME/.bash_profile ]] || fatal ".bash_profile não criado"
-    chown $VAR_USERNAME:wheel /home/$VAR_USERNAME/.bash_profile
-}
-
 set_autologin() {
     log_info "Configurando autologin de '$VAR_USERNAME'"
     mkdir -p /etc/systemd/system/getty@tty1.service.d || fatal "Falha ao criar diretório systemd override"
@@ -66,14 +53,6 @@ set_autologin() {
     systemctl enable getty@tty1.service || fatal "Falha ao habilitar autologin"
     systemctl is-enabled getty@tty1.service >/dev/null || fatal "Autologin não está habilitado"
     chown -R $VAR_USERNAME:wheel /home/$VAR_USERNAME/.config
-}
-
-cat_bash_profile() {
-cat >> /home/$VAR_USERNAME/.bash_profile << 'EOF'
-if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
-    exec Hyprland
-fi
-EOF
 }
 
 cat_autologin_conf() {
