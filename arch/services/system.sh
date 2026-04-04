@@ -56,7 +56,7 @@ check_sys_vendor() {
 set_sys_pacman() {
     log_info "Instalando aplicações e dependencias"
     check_sys_vendor
-    pacman -Sy --noconfirm base-devel grub-btrfs mtools networkmanager network-manager-applet dialog wpa_supplicant dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber pavucontrol bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $CPU man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar waybar wofi xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp inotify-tools noto-fonts ttf-font-awesome ttf-jetbrains-mono-nerd
+    pacman -Sy --noconfirm base-devel grub-btrfs os-prober mtools networkmanager network-manager-applet dialog wpa_supplicant dosfstools openssh git pipewire pipewire-pulse pipewire-jack wireplumber pavucontrol bluez bluez-utils xdg-utils xdg-user-dirs alsa-utils inetutils $CPU man-db man-pages texinfo ipset firewalld acpid hyprland kitty uwsm thunar waybar wofi xdg-desktop-portal-hyprland qt5-wayland qt6-wayland polkit-kde-agent grim slurp inotify-tools noto-fonts ttf-font-awesome ttf-jetbrains-mono-nerd
 }
     
 enable_sys_services() {
