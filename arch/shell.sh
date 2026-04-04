@@ -28,7 +28,7 @@ if check_internet; then
     run setup_aur_apps
 
     show_header "DEFININDO PREFERÊNCIAS DE USUÁRIO"
-#    run setup_hypr
+    run setup_hypr
 #    run setup_fastfetch
 #    run setup_caelestia_theme
     run setup_vscodium
@@ -47,7 +47,6 @@ if check_internet; then
     log_success "A instalação foi concluída com sucesso"
     echo ""
     read -n 1 -s -p "Pressione qualquer tecla para reiniciar.."
-    sudo reboot now
 else
     exit 0
 fi
