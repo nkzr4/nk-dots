@@ -33,6 +33,7 @@ set_grub_conf() {
     sed -i "s|GRUB_CMDLINE_LINUX=\"\"|GRUB_CMDLINE_LINUX=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
     grep -q "rd.luks.name=$DISK_LUKS_UUID=main" /etc/default/grub || fatal "CMDLINE do GRUB não aplicada corretamente"
     sed -i 's/^#GRUB_DISABLE_OS_PROBER=.*/GRUB_DISABLE_OS_PROBER=false/' /etc/default/grub
+    [[ $VAR_DUAL_BOOT == "true" ]] && os-prober
     grub-mkconfig -o /boot/grub/grub.cfg || fatal "Falha ao gerar grub.cfg"
     grep -q "@ " /boot/grub/grub.cfg || fatal "rootflags não presentes no grub.cfg"
 }
