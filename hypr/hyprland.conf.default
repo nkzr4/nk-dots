@@ -26,7 +26,7 @@ monitor=,preferred,auto,auto
 
 # Set programs that you use
 $terminal = kitty
-$fileManager = dolphin
+$fileManager = thunar
 $menu = wofi --show drun
 
 
@@ -38,8 +38,7 @@ $menu = wofi --show drun
 # Or execute your favorite apps at launch like this:
 
 # exec-once = nm-applet &
-# exec-once = waybar & hyprpaper & firefox
-
+exec-once = waybar & firefox
 exec-once = kitty -e bash --login "/home/USERNAME/.config/nk-dots/arch/shell.sh"
 
 #############################
@@ -201,7 +200,8 @@ misc {
 
 # https://wiki.hypr.land/Configuring/Variables/#input
 input {
-    kb_layout = us
+    kb_layout = LAYOUT_PLCHDR
+    kb_file = KBFILE_PLCHDR
     kb_variant =
     kb_model =
     kb_options =
@@ -235,8 +235,8 @@ device {
 $mainMod = SUPER # Sets "Windows" key as main modifier
 
 # Example binds, see https://wiki.hypr.land/Configuring/Binds/ for more
-bind = $mainMod, Q, exec, $terminal
-bind = $mainMod, C, killactive,
+bind = $mainMod, Return, exec, $terminal
+bind = $mainMod, Q, killactive,
 bind = $mainMod, M, exit,
 bind = $mainMod, E, exec, $fileManager
 bind = $mainMod, V, togglefloating,
