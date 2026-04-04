@@ -137,6 +137,14 @@ set_iwd_to_nm() {
     fi
 }
 
+cat_bash_profile() {
+cat >> /home/$VAR_USERNAME/.bash_profile << 'EOF'
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+    exec Hyprland
+fi
+EOF
+}
+
 cat_autologin_conf() {
 cat <<EOF > /etc/systemd/system/getty@tty1.service.d/autologin.conf
 [Service]
