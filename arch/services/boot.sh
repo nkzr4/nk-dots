@@ -12,7 +12,7 @@ config_boot() {
     run set_repos
     run set_autohypr
     run set_autologin
-    run set_iwd_to_nm
+    #run set_iwd_to_nm
 }
 
 set_mkinitcpio_conf() {
