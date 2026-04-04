@@ -95,11 +95,6 @@ EOF
 }
 
 set_iwd_to_nm() {
-    IFACE=$(ip -o -4 route show to default | awk '{print $5}' | head -n1)
-    TYPE=$(cat /sys/class/net/"$IFACE"/type 2>/dev/null)
-    if [ "$TYPE" = "1" ]; then
-        return 0
-    else
         log_info "Obtendo credenciais de acesso a internet"
         WIFI_DEV=$(iwctl device list | awk '/station/ {print $2; exit}')
         if [ -z "$WIFI_DEV" ]; then
@@ -134,7 +129,6 @@ set_iwd_to_nm() {
         chmod 600 "/etc/NetworkManager/system-connections/$SSID.nmconnection" 2>/dev/null
         log_sucess "Conexão criada com sucesso no NetworkManager."
         NMCLI_SET="true"
-    fi
 }
 
 cat_bash_profile() {
