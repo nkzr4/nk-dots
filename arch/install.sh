@@ -53,9 +53,9 @@ start_chroot() {
 }
 
 countdown_reboot() {
+    echo "INSTALAÇÃO FINALIZADA"
     for i in 5 4 3 2 1 0; do
-        show_header "INSTALAÇÃO FINALIZADA"
-        log_info "Reiniciando em $i..."
+        echo "Reiniciando em $i..."
         sleep 1
     done
     reboot
