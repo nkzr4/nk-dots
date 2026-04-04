@@ -21,21 +21,21 @@ if check_internet; then
     show_header "INSTALANDO AUR HELPER"
     run setup_paru
 
-    show_header "INSTALANDO CAELESTIA-SHELL"
-    run setup_caelestia
+#    show_header "INSTALANDO CAELESTIA-SHELL"
+#    run setup_caelestia
 
     show_header "INSTALANDO APLICATIVOS AUR"
     run setup_aur_apps
 
     show_header "DEFININDO PREFERÊNCIAS DE USUÁRIO"
-    run setup_hypr
-    run setup_fastfetch
-    run setup_caelestia_theme
+#    run setup_hypr
+#    run setup_fastfetch
+#    run setup_caelestia_theme
     run setup_vscodium
-    run setup_spicetify
-    run setup_vencord
+#    run setup_spicetify
+#    run setup_vencord
     run setup_mounts
-    run setup_hypr_execs
+#    run setup_hypr_execs
 
     show_header "CONFIGURANDO SNAPSHOTS"
     run setup_timeshift
