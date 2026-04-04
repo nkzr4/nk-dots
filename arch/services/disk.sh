@@ -92,7 +92,9 @@ set_mounts() {
     mountpoint -q /mnt/var/cache/pacman/pkg || fatal "pkg não montado"
     mount -o noatime$IF_SSD,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/main /mnt/.snapshots || fatal "Falha ao montar @snapshots"
     mountpoint -q /mnt/.snapshots || fatal "snapshots não montado"
-    mkfs.fat -F32 "$EFI_PARTITION" || fatal "Falha ao formatar EFI"
+    if [[ $VAR_DUAL_BOOT == "false" ]]; then
+        mkfs.fat -F32 "$EFI_PARTITION" || fatal "Falha ao formatar EFI"
+    fi
     mount "$EFI_PARTITION" /mnt/boot || fatal "Falha ao montar EFI"
     mountpoint -q /mnt/boot || fatal "EFI não montada corretamente"
     log_success "Partições montadas"
