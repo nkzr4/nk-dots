@@ -54,30 +54,18 @@ setup_caelestia() {
 setup_hypr() {
     log_info "Definindo layout do teclado"
     KEYMAPDIR="$HOME/.config/nk-dots/hypr/hyprland/keymap.xkb"
-    INPUTCONF="$HOME/.config/nk-dots/hypr/hyprland/input.conf"
+    HYPRCONF="$HOME/.config/hypr/hyprland.conf"
     if [[ "$VAR_KBLAYOUT" == "br-abnt2" ]]; then
-        sed -i "s/KBLAYOUT/br/g" $INPUTCONF
+        sed -i "s/LAYOUT_PLCHDR/br/g" $HYPRCONF
         log_success "Layout 'br' definido"
-    else
-        sed -i "s/KBLAYOUT/us/g" $INPUTCONF
-        log_success "Layout 'us' definido"
     fi
-    sed -i "s@KEYMAPDIR@$KEYMAPDIR@g" $INPUTCONF
-    log_info "Criando symlink"
-    cp $HOME/.config/hypr/hyprland/input.conf $HOME/.config/hypr/hyprland/input.conf.bak
-    rm $HOME/.config/hypr/hyprland/input.conf
-    ln -s $INPUTCONF $HOME/.config/hypr/hyprland/input.conf
     log_info "Criando keymap.xkb"
     xkbcli dump-keymap-wayland > "$KEYMAPDIR"
     log_info "Removendo delay do capslock"
     sed -i -E 's/action= *LockMods\( *modifiers=Lock *\);/action= LockMods(modifiers=Lock, unlockOnPress=true);/' "$KEYMAPDIR"
     log_info "Exportando keymap.xkb"
+    sed -i "s/KBFILE_PLCHDR/$KEYMAPDIR/g" $HYPRCONF
     log_success "keymap.xkb exportado"
-    log_info "Copiando 'variables.conf'"
-    cp $HOME/.config/hypr/variables.conf $HOME/.config/hypr/variables.conf.bak
-    rm $HOME/.config/hypr/variables.conf
-    ln -s $HOME/.config/nk-dots/hypr/variables.conf $HOME/.config/hypr/variables.conf
-    log_success "'variables.conf' copiado"
     hyprctl reload
 }
 
@@ -221,29 +209,29 @@ setup_aur_apps() {
         log_error "A instalação do VSCodium falhou"
         log_info "Tente instalar novamente após a conclusão do script"
     fi
-    log_info "Instalando Spicetify"
-    paru -S --noconfirm spicetify-cli
-    if paru -Q spicetify-cli >/dev/null 2>&1; then
-        log_success "Spicetify instalado"
-    else
-        log_error "A instalação do Spicetify falhou"
-        log_info "Tente instalar novamente após a conclusão do script"
-    fi
-    log_info "Instalando Millennium"
-    log_info "Atualizando Steam"
-    steam
-    read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já atualizou a Steam?: " CONFIRMSTEAM
-    if [[ -n "$CONFIRMSTEAM" && "$CONFIRMSTEAM" != "s" && "$CONFIRMSTEAM" != "S" ]]; then
-        log_warning "Configuração do Millennium cancelada"
-    else
-        paru -S --noconfirm millennium
-        if paru -Q millennium >/dev/null 2>&1; then
-            log_success "Millennium instalado"
-        else
-            log_error "A instalação do Millennium falhou"
-            log_info "Tente instalar novamente após a conclusão do script"
-        fi
-    fi
+    #log_info "Instalando Spicetify"
+    #paru -S --noconfirm spicetify-cli
+    #if paru -Q spicetify-cli >/dev/null 2>&1; then
+    #    log_success "Spicetify instalado"
+    #else
+    #    log_error "A instalação do Spicetify falhou"
+    #    log_info "Tente instalar novamente após a conclusão do script"
+    #fi
+    #log_info "Instalando Millennium"
+    #log_info "Atualizando Steam"
+    #steam
+    #read -p $'\033[0m[\033[1;36m  INPT  \033[0m] '"$(date '+%H:%M:%S') - Você já atualizou a Steam?: " CONFIRMSTEAM
+    #if [[ -n "$CONFIRMSTEAM" && "$CONFIRMSTEAM" != "s" && "$CONFIRMSTEAM" != "S" ]]; then
+    #    log_warning "Configuração do Millennium cancelada"
+    #else
+    #    paru -S --noconfirm millennium
+    #    if paru -Q millennium >/dev/null 2>&1; then
+    #        log_success "Millennium instalado"
+    #    else
+    #        log_error "A instalação do Millennium falhou"
+    #        log_info "Tente instalar novamente após a conclusão do script"
+    #    fi
+    #fi
     log_info "Instalando Zen Browser"
     paru -S --noconfirm zen-browser-bin
     if paru -Q zen-browser >/dev/null 2>&1; then
