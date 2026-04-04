@@ -13,9 +13,6 @@ config_boot() {
     run set_autohypr
     run set_autologin
     run set_iwd_to_nm
-    if [ "$NMCLI_SET" = "true" ]; then
-        run set_startshell
-    fi
 }
 
 set_mkinitcpio_conf() {
