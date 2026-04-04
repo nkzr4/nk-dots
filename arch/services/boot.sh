@@ -26,7 +26,8 @@ set_mkinitcpio_conf() {
 
 set_grub_conf() {
     log_info "Configurando GRUB"
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ARCH --recheck --removable || fatal "Falha no grub-install"
+    mount /dev/nvme0n1p1 /boot || fatal "Falha ao montar EFI"
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ARCH || fatal "Falha no grub-install"
     DISK_LUKS_UUID=$(blkid -s UUID -o value "$VAR_LINUX_PARTITION") || fatal "Não foi possível obter UUID LUKS"
     [[ -n "$DISK_LUKS_UUID" ]] || fatal "UUID LUKS vazio"
     sed -i "s|GRUB_CMDLINE_LINUX=\"\"|GRUB_CMDLINE_LINUX=\"loglevel=3 quiet rd.luks.name=$DISK_LUKS_UUID=main root=/dev/mapper/main rootflags=subvol=@\"|" /etc/default/grub
